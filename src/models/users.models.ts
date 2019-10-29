@@ -50,6 +50,16 @@ export interface IUser {
     avatar: IAvatar;
 }
 
+export interface IRegisterUserData {
+    roleId: Roles;
+    login: string;
+    firstName: string;
+    lastName: string;
+    educationalInstitution: string;
+    email: string;
+    password: string;
+}
+
 export interface IAvatar {
     id: number;
     label: string;
