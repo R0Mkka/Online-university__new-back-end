@@ -1,4 +1,5 @@
 export enum SwaggerTags {
-    Login = 'login',
-    Users = 'users',
+    Login = 'Login',
+    Users = 'Users',
+    Courses = 'Courses',
 }

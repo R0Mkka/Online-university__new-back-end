@@ -4,6 +4,7 @@ import { MorganModule, MorganInterceptor } from 'nest-morgan';
 
 import { AuthModule } from './auth/auth.module';
 import { UsersModule } from './users/users.module';
+import { CoursesModule } from './courses/courses.module';
 
 import { AppController } from './app.controller';
 
@@ -12,6 +13,7 @@ import { AppController } from './app.controller';
     MorganModule.forRoot(),
     AuthModule,
     UsersModule,
+    CoursesModule,
   ],
   controllers: [AppController],
   providers: [

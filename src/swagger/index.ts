@@ -11,6 +11,7 @@ const swaggerOptions = new DocumentBuilder()
     .setVersion('1.0')
     .addTag(SwaggerTags.Login)
     .addTag(SwaggerTags.Users)
+    .addTag(SwaggerTags.Courses)
     .addBearerAuth()
     .build();
 
