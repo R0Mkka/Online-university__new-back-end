@@ -5,7 +5,7 @@ import { Database } from '../database';
 import { Queries } from './users.queries';
 
 import { IUser, IFullUserData, IRegisterUserData } from '../models/users.models';
-import { ISqlSuccessResponce } from '../models/common.models';
+import { ISqlSuccessResponse } from '../models/common.models';
 import { getUserFromUserData } from '../helpers';
 
 const db = Database.getInstance();
@@ -67,12 +67,12 @@ export class UsersService {
         });
     }
 
-    public addUserEntry(userId: number): Promise<ISqlSuccessResponce> {
+    public addUserEntry(userId: number): Promise<ISqlSuccessResponse> {
         return new Promise((resolve, reject) => {
             db.query(
                 Queries.AddUserEntry,
                 [userId],
-                (error: Error, addingInfo: ISqlSuccessResponce) => {
+                (error: Error, addingInfo: ISqlSuccessResponse) => {
                     if (error) {
                         reject(new BadRequestException('[AddUserEntry] Request error!'));
                     }
@@ -83,7 +83,7 @@ export class UsersService {
         });
     }
 
-    public async registerUser(registerUserData: IRegisterUserData): Promise<ISqlSuccessResponce> {
+    public async registerUser(registerUserData: IRegisterUserData): Promise<ISqlSuccessResponse> {
         const params = Object.values(registerUserData);
         const hashedPassword = await bcrypt.hash(params.pop(), 10);
 
@@ -93,7 +93,7 @@ export class UsersService {
             db.query(
                 Queries.RegisterUser,
                 params,
-                (error: Error, creationInfo: ISqlSuccessResponce) => {
+                (error: Error, creationInfo: ISqlSuccessResponse) => {
                     if (error) {
                         reject(new BadRequestException('[RegisterUser] Request error!'));
                     }

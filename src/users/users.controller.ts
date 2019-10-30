@@ -15,7 +15,7 @@ import { UsersService } from './users.service';
 
 import { IUser, IRegisterUserData } from '../models/users.models';
 import { IAuthReq } from '../models/auth.models';
-import { ISqlSuccessResponce } from '../models/common.models';
+import { ISqlSuccessResponse } from '../models/common.models';
 import { SwaggerTags } from '../constants';
 import { registerOptions } from '../swagger/configs';
 import { UserDto } from '../swagger/classes/user';
@@ -49,7 +49,7 @@ export class UsersController {
     @ApiCreatedResponse({ description: 'The user was successfully created' })
     @ApiBadRequestResponse({ description: 'There are some problems with input data' })
     @ApiInternalServerErrorResponse({ description: 'Server internal error' })
-    public registerUser(@Body() registerUserData: IRegisterUserData): Promise<ISqlSuccessResponce> {
+    public registerUser(@Body() registerUserData: IRegisterUserData): Promise<ISqlSuccessResponse> {
         return this.usersService.registerUser(registerUserData);
     }
 }

@@ -1,4 +1,4 @@
-export interface ISqlSuccessResponce {
+export interface ISqlSuccessResponse {
     fieldCount: number;
     affectedRows: number;
     insertId: number;
