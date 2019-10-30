@@ -1,6 +1,6 @@
 import { Controller, UseGuards, Post, Request } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
-import { ApiUseTags, ApiImplicitBody, ApiInternalServerErrorResponse, ApiUnauthorizedResponse, ApiOkResponse } from '@nestjs/swagger';
+import { ApiUseTags, ApiImplicitBody, ApiInternalServerErrorResponse, ApiUnauthorizedResponse, ApiCreatedResponse } from '@nestjs/swagger';
 
 import { AuthService } from './auth/auth.service';
 
@@ -19,7 +19,7 @@ export class AppController {
   @UseGuards(AuthGuard('local'))
   @Post('login')
   @ApiImplicitBody(loginOptions)
-  @ApiOkResponse({ description: 'Auth Token', type: TokenObjectDto })
+  @ApiCreatedResponse({ description: 'Auth Token', type: TokenObjectDto })
   @ApiUnauthorizedResponse({ description: 'Unauthorized error' })
   @ApiInternalServerErrorResponse({ description: 'Server internal error' })
   public login(@Request() req: IAuthReq): Promise<ITokenObject> {

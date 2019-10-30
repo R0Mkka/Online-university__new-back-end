@@ -15,6 +15,7 @@ import { UsersService } from './users.service';
 
 import { IUser, IRegisterUserData } from '../models/users.models';
 import { IAuthReq } from '../models/auth.models';
+import { ISqlSuccessResponce } from '../models/common.models';
 import { SwaggerTags } from '../constants';
 import { registerOptions } from '../swagger/configs';
 import { UserDto } from '../swagger/classes/user';
@@ -39,7 +40,7 @@ export class UsersController {
     @ApiOkResponse({ description: 'Current user data', type: UserDto })
     @ApiUnauthorizedResponse({ description: 'Unauthorized error' })
     @ApiInternalServerErrorResponse({ description: 'Server internal error' })
-    public getCurrentUser(@Request() req: IAuthReq): any {
+    public getCurrentUser(@Request() req: IAuthReq): Promise<IUser> {
         return this.usersService.getUserById(req.user.userId);
     }
 
@@ -48,7 +49,7 @@ export class UsersController {
     @ApiCreatedResponse({ description: 'The user was successfully created' })
     @ApiBadRequestResponse({ description: 'There are some problems with input data' })
     @ApiInternalServerErrorResponse({ description: 'Server internal error' })
-    public registerUser(@Body() registerUserData: IRegisterUserData): any { // TODO: Type
+    public registerUser(@Body() registerUserData: IRegisterUserData): Promise<ISqlSuccessResponce> {
         return this.usersService.registerUser(registerUserData);
     }
 }
