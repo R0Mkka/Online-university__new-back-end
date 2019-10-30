@@ -3,5 +3,10 @@ export enum CoursesQueryList {
 }
 
 export const Queries: { [key in CoursesQueryList]: string } = {
-    GetAllUserCourses: ``,
+    GetAllUserCourses: `
+        SELECT
+            *
+        FROM
+            courses;
+    `,
 };

@@ -17,7 +17,7 @@ export class CoursesController {
     ) {}
 
     @Get()
-    public getCourseList(@Request() req: IAuthReq): any {
-        return 'Course list!';
+    public getUserCourseList(@Request() req: IAuthReq): any {
+        return this.coursesService.getUserCourseList(req.user.userId);
     }
 }
