@@ -44,8 +44,20 @@ export class CoursesService {
         };
     }
 
-    public createCourse(courseDto: ICourseCreationData, userPayload: IUserLikePayload): Promise<ISqlSuccessResponse> {
+    public async createCourse(courseDto: ICourseCreationData, userPayload: IUserLikePayload): Promise<ISqlSuccessResponse> {
         const chatName: string = `Чат курса '${courseDto.courseName}'`;
+
+        try {
+            const tempCourse: ICourseData = await this.getCourseByCode(courseDto.courseCode);
+
+            if (!!tempCourse) {
+                throw new ForbiddenException('This course code is unavailable');
+            }
+        } catch (error) {
+            if (error instanceof ForbiddenException) {
+                throw error;
+            }
+        }
 
         return Promise.all([
             this.chatsService.createChat(chatName, userPayload),
@@ -104,6 +116,8 @@ export class CoursesService {
 
     public async joinCourse(courseCode: string, userPayload: IUserLikePayload): Promise<ISqlSuccessResponse> {
         const course: ICourseData = await this.getCourseByCode(courseCode);
+
+        await this.chatsService.createUserChatConnection(course.chatId, userPayload);
 
         return this.createUserCourseConnection(course.courseId, userPayload);
     }

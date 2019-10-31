@@ -6,3 +6,10 @@ export interface ISqlSuccessResponse {
     serverStatus: number;
     warningStatus: number;
 }
+
+export interface IImage {
+    id: number;
+    label: string;
+    path: string;
+    addedAt: string;
+}
