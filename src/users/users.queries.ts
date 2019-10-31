@@ -1,4 +1,4 @@
-import { DBTables } from '../models/database.models';
+import { DBTables } from '../constants';
 
 export enum UsersQueryList {
     GetAllUsers = 'GetAllUsers',

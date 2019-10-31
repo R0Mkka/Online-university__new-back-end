@@ -1,8 +1,8 @@
 import { ApiModelProperty } from '@nestjs/swagger';
 
-import { Roles } from '../../models/users.models';
+import { Roles, IRegisterUserData } from '../../models/users.models';
 
-export class RegisterUserDataDto {
+export class RegisterUserDataDto implements IRegisterUserData {
     @ApiModelProperty({ enum: [1, 2, 3], required: true })
     public roleId: Roles;
 

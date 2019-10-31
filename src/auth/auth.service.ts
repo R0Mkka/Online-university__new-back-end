@@ -25,19 +25,29 @@ export class AuthService {
     return null;
   }
 
-  public async login(userPayload: IUserLikePayload): Promise<ITokenObject> {
+  public async login({
+    userId,
+    roleId,
+    login,
+    firstName,
+    lastName,
+    educationalInstitution,
+    email,
+    registeredAt,
+  }: IUserLikePayload): Promise<ITokenObject> {
+
     const payload: ITokenSignPayload = {
-      sub: userPayload.userId,
-      roleId: userPayload.roleId,
-      login: userPayload.login,
-      firstName: userPayload.firstName,
-      lastName: userPayload.lastName,
-      educationalInstitution: userPayload.educationalInstitution,
-      email: userPayload.email,
-      registeredAt: userPayload.registeredAt,
+      sub: userId,
+      roleId,
+      login,
+      firstName,
+      lastName,
+      educationalInstitution,
+      email,
+      registeredAt,
     };
 
-    await this.usersService.addUserEntry(userPayload.userId);
+    await this.usersService.addUserEntry(userId);
 
     return {
       token: this.jwtService.sign(payload),

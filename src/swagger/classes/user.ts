@@ -1,9 +1,9 @@
 import { ApiModelProperty } from '@nestjs/swagger';
 
-import { Roles, UserStatuses, IAvatar } from '../../models/users.models';
+import { Roles, UserStatuses, IUser, IAvatar } from '../../models/users.models';
 import { AvatarDto } from './avatar';
 
-export class UserDto {
+export class UserDto implements IUser {
     @ApiModelProperty({ type: Number, required: true })
     public userId: number;
 

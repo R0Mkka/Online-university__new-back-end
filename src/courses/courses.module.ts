@@ -2,6 +2,7 @@ import { Module } from '@nestjs/common';
 import { PassportModule } from '@nestjs/passport';
 
 import { CoursesService } from './courses.service';
+import { ChatsService } from '../chats/chats.service';
 
 import { CoursesController } from './courses.controller';
 
@@ -14,6 +15,7 @@ import { CoursesController } from './courses.controller';
     ],
     providers: [
         CoursesService,
+        ChatsService,
     ],
 })
 export class CoursesModule {}

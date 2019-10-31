@@ -1,11 +1,3 @@
-export enum DBTables {
-    Users = 'users',
-    UsersEntries = 'users_entries',
-    AccountImages = 'account_images',
-    Themes = 'themes',
-    Languages = 'languages',
-}
-
 export interface IDBConnectionConfig {
     host: string;
     port: number;

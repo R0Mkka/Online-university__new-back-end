@@ -9,6 +9,7 @@ import {
     ApiCreatedResponse,
     ApiInternalServerErrorResponse,
     ApiUnauthorizedResponse,
+    ApiNotFoundResponse,
 } from '@nestjs/swagger';
 
 import { UsersService } from './users.service';
@@ -39,6 +40,7 @@ export class UsersController {
     @Get('/current')
     @ApiOkResponse({ description: 'Current user data', type: UserDto })
     @ApiUnauthorizedResponse({ description: 'Unauthorized error' })
+    @ApiNotFoundResponse({ description: 'User was not found' })
     @ApiInternalServerErrorResponse({ description: 'Server internal error' })
     public getCurrentUser(@Request() req: IAuthReq): Promise<IUser> {
         return this.usersService.getUserById(req.user.userId);
