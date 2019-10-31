@@ -1,8 +1,8 @@
 import { ApiModelProperty } from '@nestjs/swagger';
 
-import { IShortCourseData, CourseModes } from '../../models/courses.models';
+import { ICourseData, CourseModes } from '../../models/courses.models';
 
-export class ShortCourseDataDto implements IShortCourseData {
+export class CourseDataDto implements ICourseData {
     @ApiModelProperty({ type: Number, required: true })
     public courseId: number;
 
@@ -35,7 +35,4 @@ export class ShortCourseDataDto implements IShortCourseData {
 
     @ApiModelProperty({ enum: [0, 1], required: true })
     public courseMode: CourseModes;
-
-    @ApiModelProperty({ type: String, required: true })
-    public joinedAt: string;
 }

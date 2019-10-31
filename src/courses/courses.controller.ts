@@ -17,13 +17,14 @@ import { CoursesService } from './courses.service';
 import { NoStudentsGuard } from './no-students.guard';
 
 import { IAuthReq } from '../models/auth.models';
-import { ICourseCreationData, IJoinCourseData, IShortCourseData } from '../models/courses.models';
+import { ICourseCreationData, IJoinCourseData, ICourseData, IFullCourseData } from '../models/courses.models';
 import { ISqlSuccessResponse } from '../models/common.models';
 import { SwaggerTags } from '../constants';
 import { tryNumberParse } from '../helpers';
 import { createCourseOptions, joinCourseOptions } from '../swagger/configs';
-import { ShortCourseDataDto } from '../swagger/classes/short-course-data';
+import { CourseDataDto } from '../swagger/classes/course-data';
 import { SuccessResponseDto } from '../swagger/classes/success-response';
+import { FullCourseDataDto } from '../swagger/classes/course-full-data';
 
 @UseGuards(AuthGuard())
 @ApiBearerAuth()
@@ -37,15 +38,15 @@ export class CoursesController {
     ) {}
 
     @Get()
-    @ApiOkResponse({ description: 'User course list', type: [ShortCourseDataDto] })
-    public getUserCourseList(@Request() req: IAuthReq): Promise<IShortCourseData[]> {
+    @ApiOkResponse({ description: 'User course list', type: [CourseDataDto] })
+    public getUserCourseList(@Request() req: IAuthReq): Promise<ICourseData[]> {
         return this.coursesService.getUserCourseList(req.user.userId);
     }
 
     @Get(':courseId')
-    @ApiOkResponse({ description: 'Course full data', type: Number }) // TODO: Type
+    @ApiOkResponse({ description: 'Course full data', type: FullCourseDataDto })
     @ApiNotFoundResponse({ description: 'Course does not exist' })
-    public getFullCourseData(@Param('courseId') courseIdAsString: string): Promise<any> { // TODO: Type
+    public getFullCourseData(@Param('courseId') courseIdAsString: string): Promise<IFullCourseData> {
         const courseId: number = tryNumberParse(courseIdAsString);
 
         return this.coursesService.getFullCourseData(courseId);

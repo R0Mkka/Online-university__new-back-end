@@ -28,6 +28,14 @@ export interface ICourseData {
     courseMode: CourseModes;
 }
 
-export interface IShortCourseData extends ICourseData {
-    joinedAt: string;
+export interface ICourseItem {
+    courseItemId: number;
+    courseId: number;
+    courseDataId: number;
+    courseItemTitle: string;
+    courseItemTextContent: string;
+}
+
+export interface IFullCourseData extends ICourseData {
+    courseItems: ICourseItem[];
 }

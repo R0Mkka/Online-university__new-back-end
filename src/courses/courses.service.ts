@@ -5,7 +5,7 @@ import { ChatsService } from '../chats/chats.service';
 import { Database } from './../database';
 import { CoursesQueryList, Queries } from './courses.queries';
 
-import { ICourseCreationData, ICourseData, IShortCourseData } from '../models/courses.models';
+import { ICourseCreationData, ICourseData, IFullCourseData, ICourseItem } from '../models/courses.models';
 import { ISqlSuccessResponse } from '../models/common.models';
 import { IUserLikePayload } from '../models/auth.models';
 import { newBadRequestException } from '../helpers';
@@ -18,12 +18,12 @@ export class CoursesService {
         private readonly chatsService: ChatsService,
     ) {}
 
-    public getUserCourseList(userId: number): Promise<IShortCourseData[]> {
+    public getUserCourseList(userId: number): Promise<ICourseData[]> {
         return new Promise((resolve, reject) => {
             db.query(
                 Queries.GetAllUserCourses,
                 [userId],
-                (error: Error, courses: IShortCourseData[]) => {
+                (error: Error, courses: ICourseData[]) => {
                     if (error) {
                         reject(newBadRequestException(CoursesQueryList.GetAllUserCourses));
                     }
@@ -34,9 +34,9 @@ export class CoursesService {
         });
     }
 
-    public async getFullCourseData(courseId: number): Promise<any> {
+    public async getFullCourseData(courseId: number): Promise<IFullCourseData> {
         const courseWithoutContent: ICourseData = await this.getCourseById(courseId);
-        const courseItems: any[] = await this.getCourseContent(courseId);
+        const courseItems: ICourseItem[] = await this.getCourseContent(courseId);
 
         return {
             ...courseWithoutContent,
@@ -156,12 +156,12 @@ export class CoursesService {
         });
     }
 
-    private getCourseByCode(courseCode: string): Promise<IShortCourseData> {
+    private getCourseByCode(courseCode: string): Promise<ICourseData> {
         return new Promise((resolve, reject) => {
             db.query(
                 Queries.GetCourseByCode,
                 [courseCode],
-                (error: Error, courses: IShortCourseData[]) => {
+                (error: Error, courses: ICourseData[]) => {
                     if (error) {
                         reject(newBadRequestException(CoursesQueryList.GetCourseByCode));
                     }
@@ -196,12 +196,12 @@ export class CoursesService {
         });
     }
 
-    private getCourseContent(courseId: number): Promise<any[]> {
+    private getCourseContent(courseId: number): Promise<ICourseItem[]> {
         return new Promise((resolve, reject) => {
             db.query(
                 Queries.GetCourseContent,
                 [courseId],
-                (error: Error, courseItems: any[]) => {
+                (error: Error, courseItems: ICourseItem[]) => {
                     if (error) {
                         reject(newBadRequestException(CoursesQueryList.GetCourseContent));
                     }

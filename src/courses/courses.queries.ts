@@ -25,8 +25,7 @@ export const Queries: { [key in CoursesQueryList]: string } = {
             ${DBTables.Courses}.addedAt courseCreatedAt,
             ${DBTables.CoursesPictures}.pictureName,
             ${DBTables.CoursesColorPalettes}.colorPaletteName,
-            ${DBTables.CoursesData}.courseMode,
-            ${DBTables.UsersCourses}.joinedAt
+            ${DBTables.CoursesData}.courseMode
         FROM
             ${DBTables.UsersCourses}
         LEFT JOIN ${DBTables.Courses}
