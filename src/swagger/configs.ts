@@ -17,7 +17,7 @@ export const registerOptions: ISwaggerImplicitBody = {
     type: RegisterUserDataDto,
 };
 
-export const courseOptions: ISwaggerImplicitBody = {
+export const createCourseOptions: ISwaggerImplicitBody = {
     name: 'CreateCourseDto',
     description: 'Create course data model',
     type: CreateCourseDto,

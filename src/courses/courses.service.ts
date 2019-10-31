@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException, ForbiddenException } from '@nestjs/common';
 
 import { ChatsService } from '../chats/chats.service';
 
@@ -34,6 +34,16 @@ export class CoursesService {
         });
     }
 
+    public async getFullCourseData(courseId: number): Promise<any> {
+        const courseWithoutContent: ICourseData = await this.getCourseById(courseId);
+        const courseItems: any[] = await this.getCourseContent(courseId);
+
+        return {
+            ...courseWithoutContent,
+            courseItems,
+        };
+    }
+
     public createCourse(courseDto: ICourseCreationData, userPayload: IUserLikePayload): Promise<ISqlSuccessResponse> {
         const chatName: string = `Чат курса '${courseDto.courseName}'`;
 
@@ -66,10 +76,52 @@ export class CoursesService {
         });
     }
 
+    public async removeCourse(courseId: number, userPayload: IUserLikePayload): Promise<ISqlSuccessResponse> {
+        const course: ICourseData = await this.getCourseById(courseId);
+
+        if (!course) {
+            throw new NotFoundException(`[${CoursesQueryList.RemoveCourse}] Course does not exist`);
+        }
+
+        if (course.courseOwnerId !== userPayload.userId) {
+            throw new ForbiddenException(`[${CoursesQueryList.RemoveCourse}] Course can be removed only by its owner`);
+        }
+
+        return new Promise((resolve, reject) => {
+            db.query(
+                Queries.RemoveCourse,
+                [courseId],
+                (error: Error, removingInfo: ISqlSuccessResponse) => {
+                    if (error) {
+                        reject(newBadRequestException(CoursesQueryList.RemoveCourse));
+                    }
+
+                    resolve(removingInfo);
+                },
+            );
+        });
+    }
+
     public async joinCourse(courseCode: string, userPayload: IUserLikePayload): Promise<ISqlSuccessResponse> {
         const course: ICourseData = await this.getCourseByCode(courseCode);
 
         return this.createUserCourseConnection(course.courseId, userPayload);
+    }
+
+    public async destroyConnection(courseId: number, userPayload: IUserLikePayload): Promise<ISqlSuccessResponse> {
+        return new Promise((resolve, reject) => {
+            db.query(
+                Queries.DestroyUserCourseConnection,
+                [userPayload.userId, courseId],
+                (error: Error, destroyingInfo: ISqlSuccessResponse) => {
+                    if (error) {
+                        reject(newBadRequestException(CoursesQueryList.DestroyUserCourseConnection));
+                    }
+
+                    resolve(destroyingInfo);
+                },
+            );
+        });
     }
 
     private generateCourseData(): Promise<ISqlSuccessResponse> {
@@ -119,6 +171,42 @@ export class CoursesService {
                     }
 
                     resolve(courses[0]);
+                },
+            );
+        });
+    }
+
+    private getCourseById(courseId: number): Promise<ICourseData> {
+        return new Promise((resolve, reject) => {
+            db.query(
+                Queries.GetCourseById,
+                [courseId],
+                (error: Error, courses: ICourseData[]) => {
+                    if (error) {
+                        reject(newBadRequestException(CoursesQueryList.GetCourseById));
+                    }
+
+                    if (!courses[0]) {
+                        reject(new NotFoundException(`[${CoursesQueryList.GetCourseById}] Course does not exist`));
+                    }
+
+                    resolve(courses[0]);
+                },
+            );
+        });
+    }
+
+    private getCourseContent(courseId: number): Promise<any[]> {
+        return new Promise((resolve, reject) => {
+            db.query(
+                Queries.GetCourseContent,
+                [courseId],
+                (error: Error, courseItems: any[]) => {
+                    if (error) {
+                        reject(newBadRequestException(CoursesQueryList.GetCourseContent));
+                    }
+
+                    resolve(courseItems);
                 },
             );
         });

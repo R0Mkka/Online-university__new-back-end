@@ -18,3 +18,13 @@ export const newBadRequestException = (errorEnv: string): BadRequestException =>
 export const newNotFoundException = (errorEnv: string): NotFoundException => {
   return new NotFoundException(`[${errorEnv}] Request error!`);
 };
+
+export const tryNumberParse = (stringToParse: string, errorMessage?: string): number => {
+  const num: number = parseInt(stringToParse, 10);
+
+  if (Number.isNaN(num)) {
+    throw new BadRequestException(errorMessage || 'Provided id must be of type number');
+  }
+
+  return num;
+};

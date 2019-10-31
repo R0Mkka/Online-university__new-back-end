@@ -9,6 +9,8 @@ import { SwaggerTags } from './constants';
 import { loginOptions } from './swagger/configs';
 import { TokenObjectDto } from './swagger/classes/token';
 
+
+@ApiInternalServerErrorResponse({ description: 'Server internal error' })
 @Controller()
 export class AppController {
   constructor(
@@ -22,7 +24,6 @@ export class AppController {
   @ApiCreatedResponse({ description: 'Auth Token', type: TokenObjectDto })
   @ApiUnauthorizedResponse({ description: 'Incorrect password' })
   @ApiNotFoundResponse({ description: 'User with such login does not exist' })
-  @ApiInternalServerErrorResponse({ description: 'Server internal error' })
   public login(@Request() req: IAuthReq): Promise<ITokenObject> {
     return this.authService.login(req.user);
   }

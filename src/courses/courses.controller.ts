@@ -1,4 +1,4 @@
-import { Controller, UseGuards, Get, Request, Post, Body } from '@nestjs/common';
+import { Controller, UseGuards, Get, Request, Post, Delete, Param, Body, BadRequestException } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import {
     ApiBearerAuth,
@@ -20,11 +20,15 @@ import { IAuthReq } from '../models/auth.models';
 import { ICourseCreationData, IJoinCourseData, IShortCourseData } from '../models/courses.models';
 import { ISqlSuccessResponse } from '../models/common.models';
 import { SwaggerTags } from '../constants';
-import { courseOptions, joinCourseOptions } from '../swagger/configs';
+import { tryNumberParse } from '../helpers';
+import { createCourseOptions, joinCourseOptions } from '../swagger/configs';
 import { ShortCourseDataDto } from '../swagger/classes/short-course-data';
+import { SuccessResponseDto } from '../swagger/classes/success-response';
 
 @UseGuards(AuthGuard())
 @ApiBearerAuth()
+@ApiUnauthorizedResponse({ description: 'You have to authorize and provide a token in headers' })
+@ApiInternalServerErrorResponse({ description: 'Server internal error' })
 @ApiUseTags(SwaggerTags.Courses)
 @Controller('courses')
 export class CoursesController {
@@ -34,19 +38,25 @@ export class CoursesController {
 
     @Get()
     @ApiOkResponse({ description: 'User course list', type: [ShortCourseDataDto] })
-    @ApiInternalServerErrorResponse({ description: 'Server internal error' })
     public getUserCourseList(@Request() req: IAuthReq): Promise<IShortCourseData[]> {
         return this.coursesService.getUserCourseList(req.user.userId);
     }
 
+    @Get(':courseId')
+    @ApiOkResponse({ description: 'Course full data', type: Number }) // TODO: Type
+    @ApiNotFoundResponse({ description: 'Course does not exist' })
+    public getFullCourseData(@Param('courseId') courseIdAsString: string): Promise<any> { // TODO: Type
+        const courseId: number = tryNumberParse(courseIdAsString);
+
+        return this.coursesService.getFullCourseData(courseId);
+    }
+
     @UseGuards(NoStudentsGuard)
     @Post()
-    @ApiImplicitBody(courseOptions)
-    @ApiCreatedResponse({ description: 'The course was successfully created' })
+    @ApiImplicitBody(createCourseOptions)
+    @ApiCreatedResponse({ description: 'The course was successfully created', type: SuccessResponseDto })
     @ApiBadRequestResponse({ description: 'There are some problems with input data' })
-    @ApiUnauthorizedResponse({ description: 'Unauthorized error' })
     @ApiForbiddenResponse({ description: 'Only Teachers and Admins have the opportunity to create courses' })
-    @ApiInternalServerErrorResponse({ description: 'Server internal error' })
     public createCourse(
         @Body() courseCreationInfo: ICourseCreationData,
         @Request() req: IAuthReq,
@@ -54,17 +64,41 @@ export class CoursesController {
         return this.coursesService.createCourse(courseCreationInfo, req.user);
     }
 
+    @UseGuards(NoStudentsGuard)
+    @Delete(':courseId')
+    @ApiOkResponse({ description: 'Course was removed (if existed)', type: SuccessResponseDto })
+    @ApiBadRequestResponse({ description: 'Id value type is incorrect' })
+    @ApiForbiddenResponse({ description: 'Only Teachers and Admins have the opportunity to create courses' })
+    public removeCourse(
+        @Param('courseId') courseIdAsString: string,
+        @Request() req: IAuthReq,
+    ): Promise<ISqlSuccessResponse> {
+        const courseId: number = tryNumberParse(courseIdAsString);
+
+        return this.coursesService.removeCourse(courseId, req.user);
+    }
+
     @Post('/join')
     @ApiImplicitBody(joinCourseOptions)
-    @ApiCreatedResponse({ description: 'Course joined successfully' })
+    @ApiCreatedResponse({ description: 'Course joined successfully', type: SuccessResponseDto })
     @ApiBadRequestResponse({ description: 'There are some problems with input data' })
-    @ApiUnauthorizedResponse({ description: 'Unauthorized error' })
     @ApiNotFoundResponse({ description: 'Course with such code does not exist' })
-    @ApiInternalServerErrorResponse({ description: 'Server internal error' })
     public joinCourse(
         @Body() joinCourseData: IJoinCourseData,
         @Request() req: IAuthReq,
     ): Promise<ISqlSuccessResponse> {
         return this.coursesService.joinCourse(joinCourseData.courseCode, req.user);
+    }
+
+    @Delete('/leave/:courseId')
+    @ApiOkResponse({ description: 'Course was left (if existed)', type: SuccessResponseDto })
+    @ApiBadRequestResponse({ description: 'Id value type is incorrect' })
+    public leaveCourse(
+        @Param('courseId') courseIdAsString: string,
+        @Request() req: IAuthReq,
+    ): Promise<ISqlSuccessResponse> {
+        const courseId: number = tryNumberParse(courseIdAsString);
+
+        return this.coursesService.destroyConnection(courseId, req.user);
     }
 }
