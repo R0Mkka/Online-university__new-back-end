@@ -1,11 +1,12 @@
-import { Injectable, BadRequestException } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
 
 import { Database } from '../database';
-import { Queries } from './users.queries';
+import { UsersQueryList, Queries } from './users.queries';
 
 import { IUser, IFullUserData, IRegisterUserData } from '../models/users.models';
-import { getUserFromUserData } from '../helpers';
+import { ISqlSuccessResponse } from '../models/common.models';
+import { getUserFromUserData, newBadRequestException, newNotFoundException } from '../helpers';
 
 const db = Database.getInstance();
 
@@ -18,7 +19,7 @@ export class UsersService {
                 [],
                 (error: Error, usersData: IFullUserData[]) => {
                     if (error) {
-                        reject(new BadRequestException('[GetAllUsers] Request error!'));
+                        reject(newBadRequestException(UsersQueryList.GetAllUsers));
                     }
 
                     resolve(usersData);
@@ -38,8 +39,12 @@ export class UsersService {
                 Queries.GetUserByLogin,
                 [login],
                 (error: Error, usersData: IFullUserData[]) => {
-                    if (error || !usersData[0]) {
-                        reject(new BadRequestException('[GetUserByLogin] Request error!'));
+                    if (error) {
+                        reject(newBadRequestException(UsersQueryList.GetUserByLogin));
+                    }
+
+                    if (!usersData[0]) {
+                        reject(new NotFoundException(`[${UsersQueryList.GetUserByLogin}] User with such login does not exist`));
                     }
 
                     resolve(usersData[0]);
@@ -54,8 +59,12 @@ export class UsersService {
                 Queries.GetUserById,
                 [userId],
                 (error: Error, usersData: IFullUserData[]) => {
-                    if (error || !usersData[0]) {
-                        reject(new BadRequestException('[GetUserById] Request error!'));
+                    if (error) {
+                        reject(newBadRequestException(UsersQueryList.GetUserById));
+                    }
+
+                    if (!usersData[0]) {
+                        reject(newNotFoundException(UsersQueryList.GetUserById));
                     }
 
                     const user: IUser = getUserFromUserData(usersData[0]);
@@ -66,14 +75,14 @@ export class UsersService {
         });
     }
 
-    public addUserEntry(userId: number): Promise<any> { // TODO: Type
+    public addUserEntry(userId: number): Promise<ISqlSuccessResponse> {
         return new Promise((resolve, reject) => {
             db.query(
                 Queries.AddUserEntry,
                 [userId],
-                (error: Error, addingInfo: any) => {
+                (error: Error, addingInfo: ISqlSuccessResponse) => {
                     if (error) {
-                        reject(new BadRequestException('[AddUserEntry] Request error!'));
+                        reject(newBadRequestException(UsersQueryList.AddUserEntry));
                     }
 
                     resolve(addingInfo);
@@ -82,7 +91,7 @@ export class UsersService {
         });
     }
 
-    public async registerUser(registerUserData: IRegisterUserData): Promise<any> { // TODO: Type
+    public async registerUser(registerUserData: IRegisterUserData): Promise<ISqlSuccessResponse> {
         const params = Object.values(registerUserData);
         const hashedPassword = await bcrypt.hash(params.pop(), 10);
 
@@ -92,9 +101,9 @@ export class UsersService {
             db.query(
                 Queries.RegisterUser,
                 params,
-                (error: Error, creationInfo: any) => { // TODO: Type
+                (error: Error, creationInfo: ISqlSuccessResponse) => {
                     if (error) {
-                        reject(new BadRequestException('[RegisterUser] Request error!'));
+                        reject(newBadRequestException(UsersQueryList.RegisterUser));
                     }
 
                     resolve(creationInfo);

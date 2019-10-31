@@ -1,6 +1,8 @@
 import { ApiModelProperty } from '@nestjs/swagger';
 
-export class TokenObjectDto {
+import { ITokenObject } from '../../models/auth.models';
+
+export class TokenObjectDto implements ITokenObject {
     @ApiModelProperty({ type: String, required: true })
     public token: string;
 }

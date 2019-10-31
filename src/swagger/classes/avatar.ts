@@ -1,6 +1,8 @@
 import { ApiModelProperty } from '@nestjs/swagger';
 
-export class AvatarDto {
+import { IAvatar } from '../../models/users.models';
+
+export class AvatarDto implements IAvatar {
     @ApiModelProperty({ type: Number, required: true })
     public id: number;
 
