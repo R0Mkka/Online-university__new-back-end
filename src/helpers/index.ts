@@ -1,14 +1,24 @@
 import { BadRequestException, NotFoundException } from '@nestjs/common';
 
 import { IFullUserData, IUser } from '../models/users.models';
-import { Avatar } from '../classes/avatar';
+import { IChatData, IChatWithImage } from '../models/chats.models';
+import { IImage } from '../models/common.models';
+import { Image } from '../classes/image';
 
 export const getUserFromUserData = (userData: IFullUserData): IUser => {
   const { password, avatarId, avatarLabel, avatarPath, avatarAddedAt, ...otherUserData } = userData;
 
-  const avatar = new Avatar(avatarId, avatarLabel, avatarPath, avatarAddedAt);
+  const avatar: IImage = new Image(avatarId, avatarLabel, avatarPath, avatarAddedAt);
 
   return { ...otherUserData, avatar };
+};
+
+export const getChatWithImageFromChatData = (chatData: IChatData): IChatWithImage => {
+  const { imageId, imageLabel, imagePath, imageAddedAt, ...otherChatData } = chatData;
+
+  const chatImage: IImage = new Image(imageId, imageLabel, imagePath, imageAddedAt);
+
+  return { ...otherChatData, image: chatImage };
 };
 
 export const newBadRequestException = (errorEnv: string): BadRequestException => {

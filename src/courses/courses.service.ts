@@ -8,7 +8,8 @@ import { CoursesQueryList, Queries } from './courses.queries';
 import { ICourseCreationData, ICourseData, IFullCourseData, ICourseItem } from '../models/courses.models';
 import { ISqlSuccessResponse } from '../models/common.models';
 import { IUserLikePayload } from '../models/auth.models';
-import { newBadRequestException } from '../helpers';
+import { IUser, IFullUserData } from '../models/users.models';
+import { newBadRequestException, getUserFromUserData } from '../helpers';
 
 const db = Database.getInstance();
 
@@ -37,15 +38,29 @@ export class CoursesService {
     public async getFullCourseData(courseId: number): Promise<IFullCourseData> {
         const courseWithoutContent: ICourseData = await this.getCourseById(courseId);
         const courseItems: ICourseItem[] = await this.getCourseContent(courseId);
+        const users: IUser[] = await this.getCourseUsers(courseId);
 
         return {
             ...courseWithoutContent,
             courseItems,
+            users,
         };
     }
 
-    public createCourse(courseDto: ICourseCreationData, userPayload: IUserLikePayload): Promise<ISqlSuccessResponse> {
+    public async createCourse(courseDto: ICourseCreationData, userPayload: IUserLikePayload): Promise<ISqlSuccessResponse> {
         const chatName: string = `Чат курса '${courseDto.courseName}'`;
+
+        try {
+            const tempCourse: ICourseData = await this.getCourseByCode(courseDto.courseCode);
+
+            if (!!tempCourse) {
+                throw new ForbiddenException('This course code is unavailable');
+            }
+        } catch (error) {
+            if (error instanceof ForbiddenException) {
+                throw error;
+            }
+        }
 
         return Promise.all([
             this.chatsService.createChat(chatName, userPayload),
@@ -104,6 +119,8 @@ export class CoursesService {
 
     public async joinCourse(courseCode: string, userPayload: IUserLikePayload): Promise<ISqlSuccessResponse> {
         const course: ICourseData = await this.getCourseByCode(courseCode);
+
+        await this.chatsService.createUserChatConnection(course.chatId, userPayload);
 
         return this.createUserCourseConnection(course.courseId, userPayload);
     }
@@ -207,6 +224,24 @@ export class CoursesService {
                     }
 
                     resolve(courseItems);
+                },
+            );
+        });
+    }
+
+    private getCourseUsers(courseId: number): Promise<IUser[]> {
+        return new Promise((resolve, reject) => {
+            db.query(
+                Queries.GetCourseUsers,
+                [courseId],
+                (error: Error, courseUsersData: IFullUserData[]) => {
+                    if (error) {
+                        reject(newBadRequestException(CoursesQueryList.GetCourseUsers));
+                    }
+
+                    resolve(
+                        courseUsersData.map((userData: IFullUserData) => getUserFromUserData(userData)),
+                    );
                 },
             );
         });

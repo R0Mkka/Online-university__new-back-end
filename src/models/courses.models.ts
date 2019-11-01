@@ -1,3 +1,5 @@
+import { IUser } from './users.models';
+
 export interface ICourseCreationData {
     courseName: string;
     courseGroupName: string;
@@ -38,4 +40,5 @@ export interface ICourseItem {
 
 export interface IFullCourseData extends ICourseData {
     courseItems: ICourseItem[];
+    users: IUser[];
 }

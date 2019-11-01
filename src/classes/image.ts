@@ -1,6 +1,6 @@
-import { IAvatar } from './../models/users.models';
+import { IImage } from '../models/common.models';
 
-export class Avatar implements IAvatar {
+export class Image implements IImage {
     constructor(
         public id: number,
         public label: string,

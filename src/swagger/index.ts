@@ -12,6 +12,7 @@ const swaggerOptions = new DocumentBuilder()
     .addTag(SwaggerTags.Login)
     .addTag(SwaggerTags.Users)
     .addTag(SwaggerTags.Courses)
+    .addTag(SwaggerTags.Chats)
     .addBearerAuth()
     .build();
 

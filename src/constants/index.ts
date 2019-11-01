@@ -10,10 +10,15 @@ export enum DBTables {
     CoursesPictures = 'courses_pictures',
     CoursesColorPalettes = 'courses_color_palettes',
     Chats = 'chats',
+    ChatsImages = 'chats_images',
+    UsersChats = 'users_chats',
+    Messages = 'messages',
+    MessagesStatuses = 'messages_statuses',
 }
 
 export enum SwaggerTags {
     Login = 'Login',
     Users = 'Users',
     Courses = 'Courses',
+    Chats = 'Chats',
 }

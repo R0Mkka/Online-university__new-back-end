@@ -1,7 +1,8 @@
 import { ApiModelProperty } from '@nestjs/swagger';
 
-import { Roles, UserStatuses, IUser, IAvatar } from '../../models/users.models';
-import { AvatarDto } from './avatar';
+import { Roles, UserStatuses, IUser } from '../../models/users.models';
+import { IImage } from '../../models/common.models';
+import { ImageDto } from './image';
 
 export class UserDto implements IUser {
     @ApiModelProperty({ type: Number, required: true })
@@ -35,7 +36,7 @@ export class UserDto implements IUser {
     public statusId: UserStatuses;
 
     @ApiModelProperty({ type: String, required: true })
-    public eneredAt: string;
+    public enteredAt: string;
 
     @ApiModelProperty({ type: String, required: true })
     public leftAt: string;
@@ -46,6 +47,6 @@ export class UserDto implements IUser {
     @ApiModelProperty({ type: String, required: true })
     public languageName: string;
 
-    @ApiModelProperty({ type: AvatarDto, required: true })
-    public avatar: IAvatar;
+    @ApiModelProperty({ type: ImageDto, required: true })
+    public avatar: IImage;
 }

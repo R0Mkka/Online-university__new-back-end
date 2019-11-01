@@ -1,3 +1,5 @@
+import { IImage } from './common.models';
+
 export enum Roles {
     Teacher = 1,
     Student = 2,
@@ -22,7 +24,7 @@ export interface IFullUserData {
     registeredAt: string;
     entryId: number;
     statusId: UserStatuses;
-    eneredAt: string;
+    enteredAt: string;
     leftAt: string;
     themeName: string;
     languageName: string;
@@ -43,11 +45,11 @@ export interface IUser {
     registeredAt: string;
     entryId: number;
     statusId: UserStatuses;
-    eneredAt: string;
+    enteredAt: string;
     leftAt: string;
     themeName: string;
     languageName: string;
-    avatar: IAvatar;
+    avatar: IImage;
 }
 
 export interface IRegisterUserData {
@@ -58,11 +60,4 @@ export interface IRegisterUserData {
     educationalInstitution: string;
     email: string;
     password: string;
-}
-
-export interface IAvatar {
-    id: number;
-    label: string;
-    path: string;
-    addedAt: string;
 }
