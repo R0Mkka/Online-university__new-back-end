@@ -9,7 +9,8 @@ import { ICourseCreationData, ICourseData, IFullCourseData, ICourseItem } from '
 import { ISqlSuccessResponse } from '../models/common.models';
 import { IUserLikePayload } from '../models/auth.models';
 import { IUser, IFullUserData } from '../models/users.models';
-import { newBadRequestException, getUserFromUserData } from '../helpers';
+import { NumberOrString } from '../models/database.models'
+import { newBadRequestException, getUserFromUserData } from '../helpers';;
 
 const db = Database.getInstance();
 
@@ -67,15 +68,17 @@ export class CoursesService {
             this.generateCourseData(),
         ])
         .then(([chatCreationInfo, generatedCourseDataInfo]: [ISqlSuccessResponse, ISqlSuccessResponse]) => {
+            const params: NumberOrString[] = this.getCourseCreationParams(
+                courseDto,
+                chatCreationInfo,
+                generatedCourseDataInfo,
+                userPayload,
+            );
+
             return new Promise((resolve, reject) => {
                 db.query(
                     Queries.CreateCourse,
-                    [
-                        generatedCourseDataInfo.insertId,
-                        userPayload.userId,
-                        chatCreationInfo.insertId,
-                        ...Object.values(courseDto),
-                    ],
+                    params,
                     (error: Error, courseCreationInfo: ISqlSuccessResponse) => {
                         if (error) {
                             reject(newBadRequestException(CoursesQueryList.CreateCourse));
@@ -155,6 +158,25 @@ export class CoursesService {
                 },
             );
         });
+    }
+
+    private getCourseCreationParams(
+        courseDto: ICourseCreationData,
+        chatCreationInfo: ISqlSuccessResponse,
+        generatedCourseDataInfo: ISqlSuccessResponse,
+        userPayload: IUserLikePayload,
+    ): NumberOrString[] {
+        const params: NumberOrString[] = [];
+
+        params.push(generatedCourseDataInfo.insertId);
+        params.push(userPayload.userId);
+        params.push(chatCreationInfo.insertId);
+        params.push(courseDto.courseName);
+        params.push(courseDto.courseGroupName);
+        params.push(courseDto.courseDescription);
+        params.push(courseDto.courseCode);
+
+        return params;
     }
 
     private createUserCourseConnection(newCourseId: number, userPayload: IUserLikePayload): Promise<ISqlSuccessResponse> {

@@ -30,12 +30,15 @@ export interface ICourseData {
     courseMode: CourseModes;
 }
 
-export interface ICourseItem {
-    courseItemId: number;
+export interface ICreateCourseItemData {
     courseId: number;
     courseDataId: number;
     courseItemTitle: string;
     courseItemTextContent: string;
+}
+
+export interface ICourseItem extends ICreateCourseItemData {
+    courseItemId: number;
 }
 
 export interface IFullCourseData extends ICourseData {

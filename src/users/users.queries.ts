@@ -70,9 +70,9 @@ export const Queries: { [key in UsersQueryList]: string } = {
     RegisterUser: `
         INSERT INTO ${DBTables.Users} (
             roleId,
-            login,
             firstName,
             lastName,
+            login,
             educationalInstitution,
             email,
             password

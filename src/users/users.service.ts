@@ -7,6 +7,7 @@ import { UsersQueryList, Queries } from './users.queries';
 import { IUser, IFullUserData, IRegisterUserData } from '../models/users.models';
 import { ISqlSuccessResponse } from '../models/common.models';
 import { getUserFromUserData, newBadRequestException, newNotFoundException } from '../helpers';
+import { NumberOrString } from '../models/database.models';
 
 const db = Database.getInstance();
 
@@ -92,10 +93,7 @@ export class UsersService {
     }
 
     public async registerUser(registerUserData: IRegisterUserData): Promise<ISqlSuccessResponse> {
-        const params = Object.values(registerUserData);
-        const hashedPassword = await bcrypt.hash(params.pop(), 10);
-
-        params.push(hashedPassword);
+        const params = await this.getRegisterParams(registerUserData);
 
         return new Promise((resolve, reject) => {
             db.query(
@@ -110,5 +108,20 @@ export class UsersService {
                 },
             );
         });
+    }
+
+    private async getRegisterParams(registerUserData: IRegisterUserData): Promise<NumberOrString[]> {
+        const params = [];
+        const hashedPassword = await bcrypt.hash(registerUserData.password, 10);
+
+        params.push(registerUserData.roleId);
+        params.push(registerUserData.firstName);
+        params.push(registerUserData.lastName);
+        params.push(registerUserData.login);
+        params.push(registerUserData.educationalInstitution);
+        params.push(registerUserData.email);
+        params.push(hashedPassword);
+
+        return params;
     }
 }

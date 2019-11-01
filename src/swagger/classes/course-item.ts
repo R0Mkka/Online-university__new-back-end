@@ -4,10 +4,10 @@ import { ICourseItem } from '../../models/courses.models';
 
 export class CourseItemDto implements ICourseItem {
   @ApiModelProperty({ type: Number, required: true })
-  public courseId: number;
+  public courseItemId: number;
 
   @ApiModelProperty({ type: Number, required: true })
-  public courseItemId: number;
+  public courseId: number;
 
   @ApiModelProperty({ type: Number, required: true })
   public courseDataId: number;
