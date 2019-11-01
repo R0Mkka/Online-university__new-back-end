@@ -1,10 +1,11 @@
 import { ApiModelProperty } from '@nestjs/swagger';
 
-import { IFullChatData } from '../../models/chats.models';
+import { IFullChatData, IMessageToClient } from '../../models/chats.models';
 import { IImage } from '../../models/common.models';
 import { IUser } from '../../models/users.models';
 import { ImageDto } from './image';
 import { UserDto } from './user';
+import { MessageToClientDto } from './message-to-client';
 
 export class FullChatDataDto implements IFullChatData {
   @ApiModelProperty({ type: Number, required: true })
@@ -25,6 +26,6 @@ export class FullChatDataDto implements IFullChatData {
   @ApiModelProperty({ type: [UserDto], required: true })
   public users: IUser[];
 
-  @ApiModelProperty({ type: [Object], required: true }) // TODO: Types
-  public messages: any[];
+  @ApiModelProperty({ type: [MessageToClientDto], required: true })
+  public messages: IMessageToClient[];
 }

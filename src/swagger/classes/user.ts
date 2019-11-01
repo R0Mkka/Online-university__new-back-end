@@ -36,7 +36,7 @@ export class UserDto implements IUser {
     public statusId: UserStatuses;
 
     @ApiModelProperty({ type: String, required: true })
-    public eneredAt: string;
+    public enteredAt: string;
 
     @ApiModelProperty({ type: String, required: true })
     public leftAt: string;

@@ -7,6 +7,7 @@ export enum ChatQueryList {
     GetFullChatData = 'GetFullChatData',
     GetChatUsers = 'GetChatUsers',
     GetChatMessages = 'GetChatMessages',
+    AddMessage = 'AddMessage',
 }
 
 export const Queries: { [key in ChatQueryList]: string } = {
@@ -96,12 +97,30 @@ export const Queries: { [key in ChatQueryList]: string } = {
             USING(languageId)
         WHERE chatId = ?;
     `,
-    // TODO
     GetChatMessages: `
         SELECT
-            *
+            ${DBTables.Messages}.messageId,
+            ${DBTables.Messages}.chatId,
+            ${DBTables.Messages}.userId,
+            ${DBTables.Messages}.userEntryId,
+            ${DBTables.Messages}.messageText,
+            CONCAT(${DBTables.Users}.firstName, ' ', ${DBTables.Users}.lastName) authorName,
+            ${DBTables.Messages}.sentAt,
+            ${DBTables.MessagesStatuses}.isRead
         FROM
             ${DBTables.Messages}
+        LEFT JOIN ${DBTables.MessagesStatuses}
+            USING(messageId)
+        LEFT JOIN ${DBTables.Users}
+            USING(userId)
         WHERE chatId = ?;
+    `,
+    AddMessage: `
+        INSERT INTO ${DBTables.Messages} (
+            chatId,
+            userId,
+            userEntryId,
+            messageText
+        ) VALUES (?,?,?,?);
     `,
 };

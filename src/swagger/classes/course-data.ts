@@ -21,7 +21,7 @@ export class CourseDataDto implements ICourseData {
     @ApiModelProperty({ type: String, required: true })
     public courseDescription: string;
 
-    @ApiModelProperty({ type: String, required: true })
+    @ApiModelProperty({ type: String, required: true, uniqueItems: true })
     public courseCode: string;
 
     @ApiModelProperty({ type: String, required: true })

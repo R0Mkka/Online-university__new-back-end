@@ -13,6 +13,7 @@ export enum DBTables {
     ChatsImages = 'chats_images',
     UsersChats = 'users_chats',
     Messages = 'messages',
+    MessagesStatuses = 'messages_statuses',
 }
 
 export enum SwaggerTags {

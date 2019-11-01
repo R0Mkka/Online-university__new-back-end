@@ -5,7 +5,7 @@ import { ChatQueryList, Queries } from './chats.queries';
 
 import { IUserLikePayload } from '../models/auth.models';
 import { ISqlSuccessResponse } from '../models/common.models';
-import { IChatData, IChatWithImage, IFullChatData } from '../models/chats.models';
+import { IChatData, IChatWithImage, IFullChatData, IMessageToClient } from '../models/chats.models';
 import { IUser, IFullUserData } from '../models/users.models';
 import { newBadRequestException, getUserFromUserData, getChatWithImageFromChatData } from '../helpers';
 
@@ -81,7 +81,7 @@ export class ChatsService {
 
                     const chatWithImage: IChatWithImage = getChatWithImageFromChatData(chats[0]);
                     const chatUsers: IUser[] = await this.getChatUsers(chatId);
-                    const messageList: any[] = await this.getChatMessages(chatId); // TODO: Type
+                    const messageList: IMessageToClient[] = await this.getChatMessages(chatId);
 
                     resolve({
                         ...chatWithImage,
@@ -109,12 +109,12 @@ export class ChatsService {
         });
     }
 
-    private getChatMessages(chatId: number): Promise<any[]> { // TODO: Type
+    private getChatMessages(chatId: number): Promise<IMessageToClient[]> {
         return new Promise((resolve, reject) => {
             db.query(
                 Queries.GetChatMessages,
                 [chatId],
-                (error: Error, messageList: any[]) => { // TODO: Type
+                (error: Error, messageList: IMessageToClient[]) => {
                     if (error) {
                         return reject(newBadRequestException(ChatQueryList.GetChatMessages));
                     }

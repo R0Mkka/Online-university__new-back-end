@@ -22,15 +22,22 @@ export interface IChatWithImage {
 
 export interface IFullChatData extends IChatWithImage {
   users: IUser[];
-  messages: any[]; // TODO: Type
+  messages: IMessageToClient[];
 }
 
-export interface IMessage {
+export interface IMessageToServer {
+  chatId: number;
+  messageText: string;
+  user: IUser;
+}
+
+export interface IMessageToClient {
   messageId: number;
-  messageStatusId: number;
   chatId: number;
   userId: number;
   userEntryId: number;
   messageText: string;
+  authorName: string;
   sentAt: string;
+  isRead: boolean;
 }

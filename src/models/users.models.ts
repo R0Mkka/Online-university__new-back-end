@@ -24,7 +24,7 @@ export interface IFullUserData {
     registeredAt: string;
     entryId: number;
     statusId: UserStatuses;
-    eneredAt: string;
+    enteredAt: string;
     leftAt: string;
     themeName: string;
     languageName: string;
@@ -45,7 +45,7 @@ export interface IUser {
     registeredAt: string;
     entryId: number;
     statusId: UserStatuses;
-    eneredAt: string;
+    enteredAt: string;
     leftAt: string;
     themeName: string;
     languageName: string;
