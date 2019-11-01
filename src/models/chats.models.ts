@@ -1,7 +1,7 @@
 import { IImage } from './common.models';
 import { IUser } from './users.models';
 
-export interface IFullChatData {
+export interface IChatData {
   chatId: number;
   chatOwnerId: number;
   chatName: string;
@@ -12,12 +12,25 @@ export interface IFullChatData {
   imageAddedAt: string;
 }
 
-export interface IChat {
+export interface IChatWithImage {
   chatId: number;
   chatOwnerId: number;
   chatName: string;
   createdAt: string;
   image: IImage;
+}
+
+export interface IFullChatData extends IChatWithImage {
   users: IUser[];
   messages: any[]; // TODO: Type
+}
+
+export interface IMessage {
+  messageId: number;
+  messageStatusId: number;
+  chatId: number;
+  userId: number;
+  userEntryId: number;
+  messageText: string;
+  sentAt: string;
 }

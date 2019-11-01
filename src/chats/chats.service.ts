@@ -5,24 +5,27 @@ import { ChatQueryList, Queries } from './chats.queries';
 
 import { IUserLikePayload } from '../models/auth.models';
 import { ISqlSuccessResponse } from '../models/common.models';
+import { IChatData, IChatWithImage, IFullChatData } from '../models/chats.models';
 import { IUser, IFullUserData } from '../models/users.models';
-import { newBadRequestException, getUserFromUserData } from '../helpers';
+import { newBadRequestException, getUserFromUserData, getChatWithImageFromChatData } from '../helpers';
 
 const db = Database.getInstance();
 
 @Injectable()
 export class ChatsService {
-    public getUserChatList(userPayload: IUserLikePayload): Promise<any> { // TODO: Type
+    public getUserChatList(userPayload: IUserLikePayload): Promise<IChatWithImage[]> {
         return new Promise((resolve, reject) => {
             db.query(
                 Queries.GetUserChatList,
                 [userPayload.userId],
-                (error: Error, chats: any[]) => { // TODO: Type
+                (error: Error, chats: IChatData[]) => {
                     if (error) {
-                        reject(newBadRequestException(ChatQueryList.GetUserChatList));
+                        return reject(newBadRequestException(ChatQueryList.GetUserChatList));
                     }
 
-                    resolve(chats);
+                    resolve(
+                        chats.map((chatData: IChatData) => getChatWithImageFromChatData(chatData)),
+                    );
                 },
             );
         });
@@ -35,7 +38,7 @@ export class ChatsService {
                 [userPayload.userId, chatName],
                 async (error: Error, chatCreationInfo: ISqlSuccessResponse) => {
                     if (error) {
-                        reject(newBadRequestException(ChatQueryList.CreateChat));
+                        return reject(newBadRequestException(ChatQueryList.CreateChat));
                     }
 
                     await this.createUserChatConnection(chatCreationInfo.insertId, userPayload);
@@ -53,7 +56,7 @@ export class ChatsService {
                 [userPayload.userId, chatId],
                 (error: Error, connectionCreationInfo: ISqlSuccessResponse) => {
                     if (error) {
-                        reject(newBadRequestException(ChatQueryList.CreateUserChatConnection));
+                        return reject(newBadRequestException(ChatQueryList.CreateUserChatConnection));
                     }
 
                     resolve(connectionCreationInfo);
@@ -62,25 +65,26 @@ export class ChatsService {
         });
     }
 
-    public getFullChatData(chatId: number): Promise<any> { // TODO: Type
+    public getFullChatData(chatId: number): Promise<IFullChatData> {
         return new Promise((resolve, reject) => {
             db.query(
                 Queries.GetFullChatData,
                 [chatId],
-                async (error: Error, chats: any[]) => { // TODO: Type
+                async (error: Error, chats: IChatData[]) => {
                     if (error) {
-                        reject(newBadRequestException(ChatQueryList.GetFullChatData));
+                        return reject(newBadRequestException(ChatQueryList.GetFullChatData));
                     }
 
                     if (!chats[0]) {
-                        reject(new NotFoundException('Chat does not exist'));
+                        return reject(new NotFoundException('Chat does not exist'));
                     }
 
+                    const chatWithImage: IChatWithImage = getChatWithImageFromChatData(chats[0]);
                     const chatUsers: IUser[] = await this.getChatUsers(chatId);
                     const messageList: any[] = await this.getChatMessages(chatId); // TODO: Type
 
                     resolve({
-                        ...chats[0],
+                        ...chatWithImage,
                         users: chatUsers,
                         messages: messageList,
                     });
@@ -96,7 +100,7 @@ export class ChatsService {
                 [chatId],
                 (error: Error, userList: IFullUserData[]) => {
                     if (error) {
-                        reject(newBadRequestException(ChatQueryList.GetChatUsers));
+                        return reject(newBadRequestException(ChatQueryList.GetChatUsers));
                     }
 
                     resolve(userList.map(userData => getUserFromUserData(userData)));
@@ -112,7 +116,7 @@ export class ChatsService {
                 [chatId],
                 (error: Error, messageList: any[]) => { // TODO: Type
                     if (error) {
-                        reject(newBadRequestException(ChatQueryList.GetChatMessages));
+                        return reject(newBadRequestException(ChatQueryList.GetChatMessages));
                     }
 
                     resolve(messageList);

@@ -12,11 +12,20 @@ export enum ChatQueryList {
 export const Queries: { [key in ChatQueryList]: string } = {
     GetUserChatList: `
         SELECT
-            *
+            ${DBTables.Chats}.chatId,
+            ${DBTables.Chats}.chatOwnerId,
+            ${DBTables.Chats}.chatName,
+            ${DBTables.Chats}.createdAt,
+            ${DBTables.Chats}.chatImageId imageId,
+            ${DBTables.ChatsImages}.label imageLabel,
+            ${DBTables.ChatsImages}.path imagePath,
+            ${DBTables.ChatsImages}.addedAt imageAddedAt
         FROM
             ${DBTables.UsersChats}
         LEFT JOIN ${DBTables.Chats}
             USING (chatId)
+        LEFT JOIN ${DBTables.ChatsImages}
+            USING (chatImageId)
         WHERE userId = ?
     `,
     CreateChat: `

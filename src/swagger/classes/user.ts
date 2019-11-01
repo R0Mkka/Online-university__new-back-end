@@ -2,7 +2,7 @@ import { ApiModelProperty } from '@nestjs/swagger';
 
 import { Roles, UserStatuses, IUser } from '../../models/users.models';
 import { IImage } from '../../models/common.models';
-import { IImageDto } from './avatar';
+import { ImageDto } from './image';
 
 export class UserDto implements IUser {
     @ApiModelProperty({ type: Number, required: true })
@@ -47,6 +47,6 @@ export class UserDto implements IUser {
     @ApiModelProperty({ type: String, required: true })
     public languageName: string;
 
-    @ApiModelProperty({ type: IImageDto, required: true })
+    @ApiModelProperty({ type: ImageDto, required: true })
     public avatar: IImage;
 }

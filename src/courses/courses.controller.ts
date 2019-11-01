@@ -24,7 +24,7 @@ import { tryNumberParse } from '../helpers';
 import { createCourseOptions, joinCourseOptions } from '../swagger/configs';
 import { CourseDataDto } from '../swagger/classes/course-data';
 import { SuccessResponseDto } from '../swagger/classes/success-response';
-import { FullCourseDataDto } from '../swagger/classes/course-full-data';
+import { FullCourseDataDto } from '../swagger/classes/full-course-data';
 
 @UseGuards(AuthGuard())
 @ApiBearerAuth()
@@ -43,6 +43,7 @@ export class CoursesController {
         return this.coursesService.getUserCourseList(req.user.userId);
     }
 
+    // TODO: Think about getting courses only when users are in them
     @Get(':courseId')
     @ApiOkResponse({ description: 'Course full data', type: FullCourseDataDto })
     @ApiNotFoundResponse({ description: 'Course does not exist' })

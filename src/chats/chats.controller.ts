@@ -5,13 +5,19 @@ import {
   ApiBearerAuth,
   ApiUnauthorizedResponse,
   ApiInternalServerErrorResponse,
+  ApiOkResponse,
+  ApiBadRequestResponse,
+  ApiNotFoundResponse,
 } from '@nestjs/swagger';
 
 import { ChatsService } from './chats.service';
 
 import { IAuthReq } from '../models/auth.models';
+import { IChatWithImage, IFullChatData } from '../models/chats.models';
 import { SwaggerTags } from '../constants';
 import { tryNumberParse } from '../helpers';
+import { ChatWithImageDto } from '../swagger/classes/chat-with-image';
+import { FullChatDataDto } from '../swagger/classes/full-chat-data';
 
 @UseGuards(AuthGuard())
 @ApiBearerAuth()
@@ -25,12 +31,17 @@ export class ChatsController {
   ) {}
 
   @Get()
-  public getUserChatList(@Request() req: IAuthReq): Promise<any> { // TODO: Type
+  @ApiOkResponse({ description: 'User chat list', type: [ChatWithImageDto] })
+  public getUserChatList(@Request() req: IAuthReq): Promise<IChatWithImage[]> {
     return this.chatsService.getUserChatList(req.user);
   }
 
+  // TODO: Think about getting chats only when users are in them
   @Get(':chatId')
-  public getChat(@Param('chatId') chatIdAsString: string): Promise<any> { // TODO: Type
+  @ApiOkResponse({ description: 'Chat full data', type: FullChatDataDto })
+  @ApiBadRequestResponse({ description: 'Id value type is incorrect' })
+  @ApiNotFoundResponse({ description: 'Chat does not exist' })
+  public getChat(@Param('chatId') chatIdAsString: string): Promise<IFullChatData> {
     const chatId: number = tryNumberParse(chatIdAsString);
 
     return this.chatsService.getFullChatData(chatId);

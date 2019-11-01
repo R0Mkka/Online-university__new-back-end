@@ -2,7 +2,7 @@ import { ApiModelProperty } from '@nestjs/swagger';
 
 import { IImage } from '../../models/common.models';
 
-export class IImageDto implements IImage {
+export class ImageDto implements IImage {
     @ApiModelProperty({ type: Number, required: true })
     public id: number;
 
