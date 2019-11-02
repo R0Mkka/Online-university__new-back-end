@@ -4,6 +4,7 @@ import { LoginDto } from './classes/login';
 import { RegisterUserDataDto } from './classes/register';
 import { CreateCourseDto } from './classes/create-course';
 import { JoinCourseDto } from './classes/join-course';
+import { CreateCourseItemDto } from './classes/create-course-item';
 
 export const loginOptions: ISwaggerImplicitBody = {
     name: 'LoginDto',
@@ -27,4 +28,10 @@ export const joinCourseOptions: ISwaggerImplicitBody = {
     name: 'JoinCourseDto',
     description: 'Join course data model',
     type: JoinCourseDto,
+};
+
+export const createCourseItemOptions: ISwaggerImplicitBody = {
+    name: 'CreateCourseItemDto',
+    description: 'Create course item data model',
+    type: CreateCourseItemDto,
 };

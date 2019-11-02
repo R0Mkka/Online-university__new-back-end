@@ -14,7 +14,7 @@ import {
 } from '@nestjs/swagger';
 
 import { CoursesService } from './courses.service';
-import { NoStudentsGuard } from './no-students.guard';
+import { NoStudentsGuard } from '../guards/no-students.guard';
 
 import { IAuthReq } from '../models/auth.models';
 import { ICourseCreationData, IJoinCourseData, ICourseData, IFullCourseData } from '../models/courses.models';

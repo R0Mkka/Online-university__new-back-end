@@ -32,13 +32,13 @@ export interface ICourseData {
 
 export interface ICreateCourseItemData {
     courseId: number;
-    courseDataId: number;
     courseItemTitle: string;
     courseItemTextContent: string;
 }
 
 export interface ICourseItem extends ICreateCourseItemData {
     courseItemId: number;
+    creator: IUser;
 }
 
 export interface IFullCourseData extends ICourseData {
