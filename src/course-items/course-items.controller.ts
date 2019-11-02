@@ -1,4 +1,4 @@
-import { Controller, UseGuards, Post, Delete, Patch, Body, Request, Param } from '@nestjs/common';
+import { Controller, UseGuards, Post, Delete, Patch, Body, Request, Param, Get } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import {
   ApiBearerAuth,
@@ -7,21 +7,24 @@ import {
   ApiInternalServerErrorResponse,
   ApiUseTags,
   ApiImplicitBody,
+  ApiOkResponse,
+  ApiNotFoundResponse,
 } from '@nestjs/swagger';
 
 import { CourseItemsService } from './course-items.service';
 import { NoStudentsGuard } from '../guards/no-students.guard';
 
-import { ICreateCourseItemData } from '../models/courses.models';
+import { ICreateCourseItemData, IModifyCourseItemData } from '../models/courses.models';
 import { IAuthReq } from '../models/auth.models';
 import { ISqlSuccessResponse } from '../models/common.models';
 import { SwaggerTags } from '../constants';
-import { createCourseItemOptions } from '../swagger/configs';
+import { createCourseItemOptions, modifyCourseItemOptions } from '../swagger/configs';
+import { tryNumberParse } from '../helpers';
+import { SuccessResponseDto } from '../swagger/classes/success-response';
 
 @UseGuards(AuthGuard(), NoStudentsGuard)
 @ApiBearerAuth()
 @ApiUnauthorizedResponse({ description: 'You have to authorize and provide a token in headers' })
-@ApiForbiddenResponse({ description: 'Only Teachers and Admins have the opportunity to create/remove/mofidy courses items' })
 @ApiInternalServerErrorResponse({ description: 'Server internal error' })
 @ApiUseTags(SwaggerTags.CourseItems)
 @Controller('course-items')
@@ -30,8 +33,15 @@ export class CourseItemsController {
     private readonly courseItemsService: CourseItemsService,
   ) {}
 
+  @Get(':courseItemId')
+  @ApiNotFoundResponse({ description: 'Course item does not exist' })
+  public getCourseItem(): any {
+    // TODO
+  }
+
   @Post()
   @ApiImplicitBody(createCourseItemOptions)
+  @ApiForbiddenResponse({ description: 'Only Teachers and Admins have the opportunity to create courses items' })
   public addCourseItem(
     @Body() createCourseItemData: ICreateCourseItemData,
     @Request() req: IAuthReq,
@@ -40,12 +50,25 @@ export class CourseItemsController {
   }
 
   @Delete(':courseItemId')
-  public removeCourseItem(@Param('courseItemId') courseItemIdAsString: string): any {
-    
+  @ApiOkResponse({ description: 'Course item was removed (if existed)', type: SuccessResponseDto })
+  @ApiForbiddenResponse({ description: 'Only Teachers and Admins have the opportunity to remove courses items' })
+  public removeCourseItem(@Param('courseItemId') courseItemIdAsString: string): Promise<ISqlSuccessResponse> {
+    const courseItemId: number = tryNumberParse(courseItemIdAsString);
+
+    return this.courseItemsService.removeCourseItem(courseItemId);
   }
 
-  @Patch()
-  public modifyCourseItem(@Body() courseItemDto: ICreateCourseItemData): any {
+  @Patch(':courseItemId')
+  @ApiImplicitBody(modifyCourseItemOptions)
+  @ApiOkResponse({ description: 'Course item was modified', type: SuccessResponseDto })
+  @ApiForbiddenResponse({ description: 'Only Teachers and Admins have the opportunity to mofidy courses items' })
+  @ApiNotFoundResponse({ description: 'Course item does not exist' })
+  public modifyCourseItem(
+    @Body() modifyCourseItemData: IModifyCourseItemData,
+    @Param('courseItemId') courseItemIdAsString: string,
+  ): Promise<ISqlSuccessResponse> {
+    const courseItemId: number = tryNumberParse(courseItemIdAsString);
 
+    return this.courseItemsService.modifyCourseItem(modifyCourseItemData, courseItemId);
   }
 }

@@ -30,10 +30,23 @@ export interface ICourseData {
     courseMode: CourseModes;
 }
 
+export interface ICourseItemData {
+    courseItemId: number;
+    courseId: number;
+    creatorId: number;
+    courseItemTitle: string;
+    courseItemTextContent: string;
+}
+
 export interface ICreateCourseItemData {
     courseId: number;
     courseItemTitle: string;
     courseItemTextContent: string;
+}
+
+export interface IModifyCourseItemData {
+    courseItemTitle?: string;
+    courseItemTextContent?: string;
 }
 
 export interface ICourseItem extends ICreateCourseItemData {

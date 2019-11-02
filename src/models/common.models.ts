@@ -5,6 +5,7 @@ export interface ISqlSuccessResponse {
     info: string;
     serverStatus: number;
     warningStatus: number;
+    changedRows?: number;
 }
 
 export interface IImage {
