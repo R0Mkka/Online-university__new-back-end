@@ -6,8 +6,9 @@ import { UsersQueryList, Queries } from './users.queries';
 
 import { IUser, IFullUserData, IRegisterUserData } from '../models/users.models';
 import { ISqlSuccessResponse } from '../models/common.models';
-import { getUserFromUserData, newBadRequestException, newNotFoundException } from '../helpers';
 import { NumberOrString } from '../models/database.models';
+import { IUserLikePayload } from '../models/auth.models';
+import { getUserFromUserData, newBadRequestException, newNotFoundException } from '../helpers';
 
 const db = Database.getInstance();
 
@@ -87,6 +88,22 @@ export class UsersService {
                     }
 
                     resolve(addingInfo);
+                },
+            );
+        });
+    }
+
+    public logoutUser(userPayload: IUserLikePayload): Promise<ISqlSuccessResponse> {
+        return new Promise((resolve, reject) => {
+            db.query(
+                Queries.ModiflyUserEntry,
+                [userPayload.entryId],
+                (error: Error, modifyingInfo: ISqlSuccessResponse) => {
+                    if (error) {
+                        reject(newBadRequestException(UsersQueryList.ModiflyUserEntry));
+                    }
+
+                    resolve(modifyingInfo);
                 },
             );
         });

@@ -19,6 +19,7 @@ export enum DBTables {
 
 export enum SwaggerTags {
     Login = 'Login',
+    Logout = 'Logout',
     Users = 'Users',
     Courses = 'Courses',
     CourseItems = 'CourseItems',
