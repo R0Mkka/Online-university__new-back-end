@@ -20,4 +20,7 @@ export class SuccessResponseDto implements ISqlSuccessResponse {
 
     @ApiModelProperty({ type: Number, required: true })
     public warningStatus: number;
+
+    @ApiModelProperty({ type: Number, required: false })
+    public changedRows: number;
 }

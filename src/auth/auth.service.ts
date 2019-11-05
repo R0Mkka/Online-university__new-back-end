@@ -6,6 +6,7 @@ import { UsersService } from '../users/users.service';
 
 import { IUser, IFullUserData } from '../models/users.models';
 import { ITokenObject, ITokenSignPayload, IUserLikePayload } from '../models/auth.models';
+import { ISqlSuccessResponse } from '../models/common.models';
 import { getUserFromUserData } from '../helpers';
 
 @Injectable()
@@ -36,6 +37,8 @@ export class AuthService {
     registeredAt,
   }: IUserLikePayload): Promise<ITokenObject> {
 
+    const res: ISqlSuccessResponse = await this.usersService.addUserEntry(userId);
+
     const payload: ITokenSignPayload = {
       sub: userId,
       roleId,
@@ -45,17 +48,15 @@ export class AuthService {
       educationalInstitution,
       email,
       registeredAt,
+      entryId: res.insertId,
     };
-
-    await this.usersService.addUserEntry(userId);
 
     return {
       token: this.jwtService.sign(payload),
     };
   }
 
-  public logout(user: any): void {
-    // TODO:
-    // return this.usersService.deleteEnteredUser(user.userId);
+  public logout(userPayload: IUserLikePayload): Promise<ISqlSuccessResponse> {
+    return this.usersService.logoutUser(userPayload);
   }
 }

@@ -5,6 +5,7 @@ export enum UsersQueryList {
     GetUserByLogin = 'GetUserByLogin',
     GetUserById = 'GetUserById',
     AddUserEntry = 'AddUserEntry',
+    ModiflyUserEntry = 'ModiflyUserEntry',
     RegisterUser = 'RegisterUser',
 }
 
@@ -67,12 +68,21 @@ export const Queries: { [key in UsersQueryList]: string } = {
         ) VALUES (?);
     `,
 
+    ModiflyUserEntry: `
+        UPDATE
+            ${DBTables.UsersEntries}
+        SET
+            leftAt = CURRENT_TIMESTAMP
+        WHERE
+            userEntryId = ?;
+    `,
+
     RegisterUser: `
         INSERT INTO ${DBTables.Users} (
             roleId,
-            login,
             firstName,
             lastName,
+            login,
             educationalInstitution,
             email,
             password

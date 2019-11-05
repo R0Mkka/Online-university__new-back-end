@@ -1,14 +1,16 @@
 import { Injectable, NotFoundException, ForbiddenException } from '@nestjs/common';
 
 import { ChatsService } from '../chats/chats.service';
+import { CourseItemsService } from '../course-items/course-items.service';
 
 import { Database } from './../database';
 import { CoursesQueryList, Queries } from './courses.queries';
 
-import { ICourseCreationData, ICourseData, IFullCourseData, ICourseItem } from '../models/courses.models';
+import { ICourseCreationData, ICourseData, IFullCourseData, ICourseItemData, ICourseItem } from '../models/courses.models';
 import { ISqlSuccessResponse } from '../models/common.models';
 import { IUserLikePayload } from '../models/auth.models';
 import { IUser, IFullUserData } from '../models/users.models';
+import { NumberOrString } from '../models/database.models';
 import { newBadRequestException, getUserFromUserData } from '../helpers';
 
 const db = Database.getInstance();
@@ -17,6 +19,7 @@ const db = Database.getInstance();
 export class CoursesService {
     constructor(
         private readonly chatsService: ChatsService,
+        private readonly courseItemsService: CourseItemsService,
     ) {}
 
     public getUserCourseList(userId: number): Promise<ICourseData[]> {
@@ -67,15 +70,17 @@ export class CoursesService {
             this.generateCourseData(),
         ])
         .then(([chatCreationInfo, generatedCourseDataInfo]: [ISqlSuccessResponse, ISqlSuccessResponse]) => {
+            const params: NumberOrString[] = this.getCourseCreationParams(
+                courseDto,
+                chatCreationInfo,
+                generatedCourseDataInfo,
+                userPayload,
+            );
+
             return new Promise((resolve, reject) => {
                 db.query(
                     Queries.CreateCourse,
-                    [
-                        generatedCourseDataInfo.insertId,
-                        userPayload.userId,
-                        chatCreationInfo.insertId,
-                        ...Object.values(courseDto),
-                    ],
+                    params,
                     (error: Error, courseCreationInfo: ISqlSuccessResponse) => {
                         if (error) {
                             reject(newBadRequestException(CoursesQueryList.CreateCourse));
@@ -157,6 +162,25 @@ export class CoursesService {
         });
     }
 
+    private getCourseCreationParams(
+        courseDto: ICourseCreationData,
+        chatCreationInfo: ISqlSuccessResponse,
+        generatedCourseDataInfo: ISqlSuccessResponse,
+        userPayload: IUserLikePayload,
+    ): NumberOrString[] {
+        const params: NumberOrString[] = [];
+
+        params.push(generatedCourseDataInfo.insertId);
+        params.push(userPayload.userId);
+        params.push(chatCreationInfo.insertId);
+        params.push(courseDto.courseName);
+        params.push(courseDto.courseGroupName);
+        params.push(courseDto.courseDescription);
+        params.push(courseDto.courseCode);
+
+        return params;
+    }
+
     private createUserCourseConnection(newCourseId: number, userPayload: IUserLikePayload): Promise<ISqlSuccessResponse> {
         return new Promise((resolve, reject) => {
             db.query(
@@ -218,10 +242,18 @@ export class CoursesService {
             db.query(
                 Queries.GetCourseContent,
                 [courseId],
-                (error: Error, courseItems: ICourseItem[]) => {
+                (error: Error, courseItemsData: ICourseItemData[]) => {
                     if (error) {
                         reject(newBadRequestException(CoursesQueryList.GetCourseContent));
                     }
+
+                    const courseItems: ICourseItem[] = [];
+
+                    courseItemsData.forEach(async (courseItemData) => {
+                        const courseItem: ICourseItem = await this.courseItemsService.getCourseItemFromCourseItemData(courseItemData);
+
+                        courseItems.push(courseItem);
+                    });
 
                     resolve(courseItems);
                 },

@@ -30,6 +30,7 @@ export class UsersController {
         private readonly usersService: UsersService,
     ) {}
 
+    // TODO: Add guard for only Admin access
     @Get()
     @ApiOkResponse({ description: 'User list', type: [UserDto] })
     public getUserList(): Promise<IUser[]> {
@@ -53,4 +54,6 @@ export class UsersController {
     public registerUser(@Body() registerUserData: IRegisterUserData): Promise<ISqlSuccessResponse> {
         return this.usersService.registerUser(registerUserData);
     }
+
+    // TODO: Add removing users functionality
 }

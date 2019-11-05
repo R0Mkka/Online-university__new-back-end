@@ -5,6 +5,7 @@ import { MorganModule, MorganInterceptor } from 'nest-morgan';
 import { AuthModule } from './auth/auth.module';
 import { UsersModule } from './users/users.module';
 import { CoursesModule } from './courses/courses.module';
+import { CourseItems } from './course-items/course-items.module';
 import { ChatsModule } from './chats/chats.module';
 
 import { AppController } from './app.controller';
@@ -15,6 +16,7 @@ import { AppController } from './app.controller';
     AuthModule,
     UsersModule,
     CoursesModule,
+    CourseItems,
     ChatsModule,
   ],
   controllers: [AppController],
