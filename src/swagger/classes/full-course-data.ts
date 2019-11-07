@@ -12,6 +12,9 @@ export class FullCourseDataDto implements IFullCourseData {
   @ApiModelProperty({ type: Number, required: true })
   public courseOwnerId: number;
 
+  @ApiModelProperty({ type: String, required: true })
+  public courseOwnerFullName: string;
+
   @ApiModelProperty({ type: Number, required: true })
   public chatId: number;
 
