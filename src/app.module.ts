@@ -7,6 +7,7 @@ import { UsersModule } from './users/users.module';
 import { CoursesModule } from './courses/courses.module';
 import { CourseItems } from './course-items/course-items.module';
 import { ChatsModule } from './chats/chats.module';
+import { FilesModule } from './upload/files.module';
 
 import { AppController } from './app.controller';
 
@@ -18,6 +19,7 @@ import { AppController } from './app.controller';
     CoursesModule,
     CourseItems,
     ChatsModule,
+    FilesModule,
   ],
   controllers: [AppController],
   providers: [

@@ -1,4 +1,4 @@
-import { IImage } from './common.models';
+import { IFile } from './common.models';
 
 export enum Roles {
     Teacher = 1,
@@ -29,8 +29,11 @@ export interface IFullUserData {
     themeName: string;
     languageName: string;
     avatarId: number;
-    avatarLabel: string;
     avatarPath: string;
+    avatarName: string;
+    avatarOriginalName: string;
+    avatarMimeType: string;
+    avatarSize: number;
     avatarAddedAt: string;
 }
 
@@ -49,7 +52,7 @@ export interface IUser {
     leftAt: string;
     themeName: string;
     languageName: string;
-    avatar: IImage;
+    avatar: IFile;
 }
 
 export interface IRegisterUserData {

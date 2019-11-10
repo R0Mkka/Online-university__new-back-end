@@ -19,6 +19,7 @@ export enum CourseModes {
 export interface ICourseData {
     courseId: number;
     courseOwnerId: number;
+    courseOwnerFullName: string;
     chatId: number;
     courseName: string;
     courseGroupName: string;

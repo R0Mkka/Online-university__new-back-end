@@ -25,8 +25,11 @@ const GET_USERS_FULL_INFO = `
         ${DBTables.UsersEntries}.enteredAt,
         ${DBTables.UsersEntries}.leftAt,
         ${DBTables.AccountImages}.accountImageId avatarId,
-        ${DBTables.AccountImages}.label avatarLabel,
         ${DBTables.AccountImages}.path avatarPath,
+        ${DBTables.AccountImages}.name avatarName,
+        ${DBTables.AccountImages}.originalName avatarOriginalName,
+        ${DBTables.AccountImages}.mimeType avatarMimeType,
+        ${DBTables.AccountImages}.size avatarSize,
         ${DBTables.AccountImages}.addedAt avatarAddedAt,
         ${DBTables.Themes}.themeName,
         ${DBTables.Languages}.languageName

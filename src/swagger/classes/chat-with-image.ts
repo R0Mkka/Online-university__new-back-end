@@ -1,8 +1,8 @@
 import { ApiModelProperty } from '@nestjs/swagger';
 
 import { IChatWithImage } from '../../models/chats.models';
-import { IImage } from '../../models/common.models';
-import { ImageDto } from './image';
+import { IFile } from '../../models/common.models';
+import { FileDto } from './file';
 
 export class ChatWithImageDto implements IChatWithImage {
   @ApiModelProperty({ type: Number, required: true })
@@ -17,6 +17,6 @@ export class ChatWithImageDto implements IChatWithImage {
   @ApiModelProperty({ type: String, required: true })
   public createdAt: string;
 
-  @ApiModelProperty({ type: ImageDto, required: true })
-  public image: IImage;
+  @ApiModelProperty({ type: FileDto, required: true })
+  public image: IFile;
 }

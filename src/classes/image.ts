@@ -1,10 +1,13 @@
-import { IImage } from '../models/common.models';
+import { IFile } from '../models/common.models';
 
-export class Image implements IImage {
+export class Image implements IFile {
     constructor(
         public id: number,
-        public label: string,
         public path: string,
+        public name: string,
+        public originalName: string,
+        public mimeType: string,
+        public size: number,
         public addedAt: string,
     ) {}
 }

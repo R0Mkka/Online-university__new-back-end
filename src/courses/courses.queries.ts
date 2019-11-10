@@ -18,6 +18,7 @@ export const Queries: { [key in CoursesQueryList]: string } = {
         SELECT
             ${DBTables.Courses}.courseId,
             ${DBTables.Courses}.courseOwnerId,
+            CONCAT(${DBTables.Users}.firstName, ' ', ${DBTables.Users}.lastName) courseOwnerFullName,
             ${DBTables.Courses}.chatId,
             ${DBTables.Courses}.courseName,
             ${DBTables.Courses}.courseGroupName,
@@ -31,6 +32,8 @@ export const Queries: { [key in CoursesQueryList]: string } = {
             ${DBTables.UsersCourses}
         LEFT JOIN ${DBTables.Courses}
             USING(courseId)
+        LEFT JOIN ${DBTables.Users}
+            ON ${DBTables.Courses}.courseOwnerId = ${DBTables.Users}.userId
         LEFT JOIN ${DBTables.CoursesData}
             USING(courseDataId)
         LEFT JOIN ${DBTables.CoursesPictures}
@@ -74,6 +77,7 @@ export const Queries: { [key in CoursesQueryList]: string } = {
         SELECT
             ${DBTables.Courses}.courseId,
             ${DBTables.Courses}.courseOwnerId,
+            CONCAT(${DBTables.Users}.firstName, ' ', ${DBTables.Users}.lastName) courseOwnerFullName,
             ${DBTables.Courses}.chatId,
             ${DBTables.Courses}.courseName,
             ${DBTables.Courses}.courseGroupName,
@@ -85,6 +89,8 @@ export const Queries: { [key in CoursesQueryList]: string } = {
             ${DBTables.CoursesData}.courseMode
         FROM
             ${DBTables.Courses}
+        LEFT JOIN ${DBTables.Users}
+            ON ${DBTables.Courses}.courseOwnerId = ${DBTables.Users}.userId
         LEFT JOIN ${DBTables.CoursesData}
             USING(courseDataId)
         LEFT JOIN ${DBTables.CoursesPictures}
@@ -97,6 +103,7 @@ export const Queries: { [key in CoursesQueryList]: string } = {
         SELECT
             ${DBTables.Courses}.courseId,
             ${DBTables.Courses}.courseOwnerId,
+            CONCAT(${DBTables.Users}.firstName, ' ', ${DBTables.Users}.lastName) courseOwnerFullName,
             ${DBTables.Courses}.chatId,
             ${DBTables.Courses}.courseName,
             ${DBTables.Courses}.courseGroupName,
@@ -108,6 +115,8 @@ export const Queries: { [key in CoursesQueryList]: string } = {
             ${DBTables.CoursesData}.courseMode
         FROM
             ${DBTables.Courses}
+        LEFT JOIN ${DBTables.Users}
+            ON ${DBTables.Courses}.courseOwnerId = ${DBTables.Users}.userId
         LEFT JOIN ${DBTables.CoursesData}
             USING(courseDataId)
         LEFT JOIN ${DBTables.CoursesPictures}
@@ -137,8 +146,11 @@ export const Queries: { [key in CoursesQueryList]: string } = {
             ${DBTables.UsersEntries}.enteredAt,
             ${DBTables.UsersEntries}.leftAt,
             ${DBTables.AccountImages}.accountImageId avatarId,
-            ${DBTables.AccountImages}.label avatarLabel,
             ${DBTables.AccountImages}.path avatarPath,
+            ${DBTables.AccountImages}.name avatarName,
+            ${DBTables.AccountImages}.originalName avatarOriginalName,
+            ${DBTables.AccountImages}.mimeType avatarMimeType,
+            ${DBTables.AccountImages}.size avatarSize,
             ${DBTables.AccountImages}.addedAt avatarAddedAt,
             ${DBTables.Themes}.themeName,
             ${DBTables.Languages}.languageName

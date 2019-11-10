@@ -24,4 +24,5 @@ export enum SwaggerTags {
     Courses = 'Courses',
     CourseItems = 'CourseItems',
     Chats = 'Chats',
+    Files = 'Files',
 }
