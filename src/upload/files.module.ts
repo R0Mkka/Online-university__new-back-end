@@ -1,19 +1,19 @@
 import { Module } from '@nestjs/common';
 import { PassportModule } from '@nestjs/passport';
 
-import { UploadService } from './upload.service';
+import { FilesService } from './files.service';
 
-import { UploadController } from './upload.controller';
+import { FilesController } from './files.controller';
 
 @Module({
   imports: [
     PassportModule.register({ defaultStrategy: 'jwt' }),
   ],
   controllers: [
-    UploadController,
+    FilesController,
   ],
   providers: [
-    UploadService,
+    FilesService,
   ],
 })
-export class UploadModule {}
+export class FilesModule {}

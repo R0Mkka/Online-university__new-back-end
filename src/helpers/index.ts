@@ -2,21 +2,56 @@ import { BadRequestException, NotFoundException } from '@nestjs/common';
 
 import { IFullUserData, IUser } from '../models/users.models';
 import { IChatData, IChatWithImage } from '../models/chats.models';
-import { IImage } from '../models/common.models';
+import { IFile } from '../models/common.models';
 import { Image } from '../classes/image';
 
 export const getUserFromUserData = (userData: IFullUserData): IUser => {
-  const { password, avatarId, avatarLabel, avatarPath, avatarAddedAt, ...otherUserData } = userData;
+  const {
+    password,
+    avatarId,
+    avatarPath,
+    avatarName,
+    avatarOriginalName,
+    avatarMimeType,
+    avatarSize,
+    avatarAddedAt,
+    ...otherUserData
+  } = userData;
 
-  const avatar: IImage = new Image(avatarId, avatarLabel, avatarPath, avatarAddedAt);
+  const avatar: IFile = new Image(
+    avatarId,
+    avatarPath,
+    avatarName,
+    avatarOriginalName,
+    avatarMimeType,
+    avatarSize,
+    avatarAddedAt,
+  );
 
   return { ...otherUserData, avatar };
 };
 
 export const getChatWithImageFromChatData = (chatData: IChatData): IChatWithImage => {
-  const { imageId, imageLabel, imagePath, imageAddedAt, ...otherChatData } = chatData;
+  const {
+    imageId,
+    imagePath,
+    imageName,
+    imageOriginalName,
+    imageMimeType,
+    imageSize,
+    imageAddedAt,
+    ...otherChatData
+  } = chatData;
 
-  const chatImage: IImage = new Image(imageId, imageLabel, imagePath, imageAddedAt);
+  const chatImage: IFile = new Image(
+    imageId,
+    imagePath,
+    imageName,
+    imageOriginalName,
+    imageMimeType,
+    imageSize,
+    imageAddedAt,
+  );
 
   return { ...otherChatData, image: chatImage };
 };

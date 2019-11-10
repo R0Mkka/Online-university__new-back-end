@@ -8,9 +8,12 @@ export interface ISqlSuccessResponse {
     changedRows?: number;
 }
 
-export interface IImage {
+export interface IFile {
     id: number;
-    label: string;
     path: string;
+    name: string;
+    originalName: string;
+    mimeType: string;
+    size: number;
     addedAt: string;
 }

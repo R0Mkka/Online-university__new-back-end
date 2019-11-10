@@ -18,8 +18,11 @@ export const Queries: { [key in ChatQueryList]: string } = {
             ${DBTables.Chats}.chatName,
             ${DBTables.Chats}.createdAt,
             ${DBTables.Chats}.chatImageId imageId,
-            ${DBTables.ChatsImages}.label imageLabel,
             ${DBTables.ChatsImages}.path imagePath,
+            ${DBTables.ChatsImages}.name imageName,
+            ${DBTables.ChatsImages}.originalName imageOriginalName,
+            ${DBTables.ChatsImages}.mimeType imageMimeType,
+            ${DBTables.ChatsImages}.size imageSize,
             ${DBTables.ChatsImages}.addedAt imageAddedAt
         FROM
             ${DBTables.UsersChats}
@@ -48,8 +51,11 @@ export const Queries: { [key in ChatQueryList]: string } = {
             ${DBTables.Chats}.chatName,
             ${DBTables.Chats}.createdAt,
             ${DBTables.Chats}.chatImageId imageId,
-            ${DBTables.ChatsImages}.label imageLabel,
             ${DBTables.ChatsImages}.path imagePath,
+            ${DBTables.ChatsImages}.name imageName,
+            ${DBTables.ChatsImages}.originalName imageOriginalName,
+            ${DBTables.ChatsImages}.mimeType imageMimeType,
+            ${DBTables.ChatsImages}.size imageSize,
             ${DBTables.ChatsImages}.addedAt imageAddedAt
         FROM
             ${DBTables.Chats}
@@ -73,8 +79,11 @@ export const Queries: { [key in ChatQueryList]: string } = {
             ${DBTables.UsersEntries}.enteredAt,
             ${DBTables.UsersEntries}.leftAt,
             ${DBTables.AccountImages}.accountImageId avatarId,
-            ${DBTables.AccountImages}.label avatarLabel,
             ${DBTables.AccountImages}.path avatarPath,
+            ${DBTables.AccountImages}.name avatarName,
+            ${DBTables.AccountImages}.originalName avatarOriginalName,
+            ${DBTables.AccountImages}.mimeType avatarMimeType,
+            ${DBTables.AccountImages}.size avatarSize,
             ${DBTables.AccountImages}.addedAt avatarAddedAt,
             ${DBTables.Themes}.themeName,
             ${DBTables.Languages}.languageName
