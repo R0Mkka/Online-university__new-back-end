@@ -127,6 +127,22 @@ export class UsersService {
         });
     }
 
+    public async deleteUser(userId: number): Promise<ISqlSuccessResponse> {
+        return new Promise((resolve, reject) => {
+            db.query(
+                Queries.DeleteUser,
+                [userId],
+                (error: Error, deletingInfo: ISqlSuccessResponse) => {
+                    if (error) {
+                        reject(newBadRequestException(UsersQueryList.DeleteUser));
+                    }
+
+                    resolve(deletingInfo);
+                },
+            );
+        });
+    }
+
     private async getRegisterParams(registerUserData: IRegisterUserData): Promise<NumberOrString[]> {
         const params = [];
         const hashedPassword = await bcrypt.hash(registerUserData.password, 10);

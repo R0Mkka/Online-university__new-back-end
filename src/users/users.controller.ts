@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, UseGuards, Request } from '@nestjs/common';
+import { Controller, Get, Post, Body, UseGuards, Request, Delete, Param } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import {
     ApiUseTags,
@@ -18,6 +18,7 @@ import { IUser, IRegisterUserData } from '../models/users.models';
 import { IAuthReq } from '../models/auth.models';
 import { ISqlSuccessResponse } from '../models/common.models';
 import { SwaggerTags } from '../constants';
+import { tryNumberParse } from '../helpers';
 import { registerOptions } from '../swagger/configs';
 import { UserDto } from '../swagger/classes/user';
 import { SuccessResponseDto } from '../swagger/classes/success-response';
@@ -55,5 +56,13 @@ export class UsersController {
         return this.usersService.registerUser(registerUserData);
     }
 
-    // TODO: Add removing users functionality
+    // TODO: Add guard for only Admin access
+    @Delete(':userId')
+    @ApiOkResponse({ description: 'User was removed (if existed)', type: SuccessResponseDto })
+    @ApiBadRequestResponse({ description: 'Id value type is incorrect' })
+    public deleteUser(@Param('userId') userIdAsString: string): Promise<any> {
+        const userId: number = tryNumberParse(userIdAsString);
+
+        return this.usersService.deleteUser(userId);
+    }
 }
