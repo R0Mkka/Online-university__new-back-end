@@ -2,6 +2,7 @@ import { Module } from '@nestjs/common';
 import { PassportModule } from '@nestjs/passport';
 
 import { FilesService } from './files.service';
+import { UsersService } from '../users/users.service';
 
 import { FilesController } from './files.controller';
 
@@ -14,6 +15,7 @@ import { FilesController } from './files.controller';
   ],
   providers: [
     FilesService,
+    UsersService,
   ],
 })
 export class FilesModule {}

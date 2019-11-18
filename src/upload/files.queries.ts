@@ -15,6 +15,7 @@ export const FilesQueries: { [key in FilesQueryList]: string } = {
       size
     ) VALUES (?,?,?,?,?);
   `,
+  
   BindAvatarToUser: `
     UPDATE
       ${DBTables.Users}

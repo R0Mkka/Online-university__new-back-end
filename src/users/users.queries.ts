@@ -7,6 +7,7 @@ export enum UsersQueryList {
     AddUserEntry = 'AddUserEntry',
     ModiflyUserEntry = 'ModiflyUserEntry',
     RegisterUser = 'RegisterUser',
+    DeleteUser = 'DeleteUser',
 }
 
 const GET_USERS_FULL_INFO = `
@@ -90,5 +91,11 @@ export const Queries: { [key in UsersQueryList]: string } = {
             email,
             password
         ) VALUES (?,?,?,?,?,?,?);
+    `,
+
+    DeleteUser: `
+        DELETE
+        FROM ${DBTables.Users}
+        WHERE userId = ?;
     `,
 };

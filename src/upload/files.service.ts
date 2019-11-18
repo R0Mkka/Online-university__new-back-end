@@ -1,8 +1,13 @@
 import { Injectable } from '@nestjs/common';
+import * as fs from 'fs';
+import * as path from 'path';
+
+import { UsersService } from '../users/users.service';
 
 import { Database } from '../database';
 import { FilesQueries, FilesQueryList } from './files.queries';
 
+import { IUser } from '../models/users.models';
 import { IFile } from '../models/upload.models';
 import { IUserLikePayload } from '../models/auth.models';
 import { ISqlSuccessResponse } from '../models/common.models';
@@ -13,7 +18,21 @@ const db = Database.getInstance();
 
 @Injectable()
 export class FilesService {
-  public uploadUserAvatar(avatar: IFile, userPayload: IUserLikePayload): Promise<IFile> {
+  constructor(
+    private readonly usersService: UsersService,
+  ) {}
+
+  public async uploadUserAvatar(avatar: IFile, userPayload: IUserLikePayload): Promise<IFile> {
+    const user: IUser = await this.usersService.getUserById(userPayload.userId);
+
+    if (!!user.avatar.id) {
+      const filePath: string = path.join(__dirname, '../', '../', 'files', user.avatar.name);
+
+      fs.unlink(filePath, (error: Error) => {
+        return Promise.reject(error);
+      });
+    }
+
     const params: NumberOrString[] = this.getUploadUserAvatarParams(avatar);
 
     return new Promise((resolve, reject) => {
