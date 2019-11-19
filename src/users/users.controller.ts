@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, UseGuards, Request, Delete, Param } from '@nestjs/common';
+import { Controller, Get, Post, Body, UseGuards, Request, Delete, Param, Patch } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import {
     ApiUseTags,
@@ -56,11 +56,22 @@ export class UsersController {
         return this.usersService.registerUser(registerUserData);
     }
 
+    // TODO: Swagger
+    @Patch(':userId')
+    public modifyUser(
+        @Body() modifyUserData: any, // TODO: Type
+        @Param('userId') userIdAsString: string,
+    ): Promise<ISqlSuccessResponse> {
+        const userId: number = tryNumberParse(userIdAsString);
+
+        return this.usersService.modifyUser(modifyUserData, userId);
+    }
+
     // TODO: Add guard for only Admin access
     @Delete(':userId')
     @ApiOkResponse({ description: 'User was removed (if existed)', type: SuccessResponseDto })
     @ApiBadRequestResponse({ description: 'Id value type is incorrect' })
-    public deleteUser(@Param('userId') userIdAsString: string): Promise<any> {
+    public deleteUser(@Param('userId') userIdAsString: string): Promise<ISqlSuccessResponse> {
         const userId: number = tryNumberParse(userIdAsString);
 
         return this.usersService.deleteUser(userId);

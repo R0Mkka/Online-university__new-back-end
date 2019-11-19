@@ -7,6 +7,7 @@ export enum UsersQueryList {
     AddUserEntry = 'AddUserEntry',
     ModiflyUserEntry = 'ModiflyUserEntry',
     RegisterUser = 'RegisterUser',
+    ModifyUser = 'ModifyUser',
     DeleteUser = 'DeleteUser',
 }
 
@@ -93,9 +94,25 @@ export const Queries: { [key in UsersQueryList]: string } = {
         ) VALUES (?,?,?,?,?,?,?);
     `,
 
+    ModifyUser: `
+        UPDATE
+            ${DBTables.Users}
+        SET
+            firstName = ?,
+            lastName = ?,
+            roleId = ?,
+            educationalInstitution = ?,
+            login = ?,
+            email = ?
+        WHERE
+            userId = ?;
+    `,
+
     DeleteUser: `
         DELETE
-        FROM ${DBTables.Users}
-        WHERE userId = ?;
+        FROM
+            ${DBTables.Users}
+        WHERE
+            userId = ?;
     `,
 };

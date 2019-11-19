@@ -14,4 +14,7 @@ export class CreateCourseDto implements ICourseCreationData {
 
     @ApiModelProperty({ type: String, required: true })
     public courseCode: string;
+
+    @ApiModelProperty({ type: String, required: true })
+    public addedAt: string;
 }

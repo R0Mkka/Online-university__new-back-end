@@ -21,7 +21,7 @@ export class UsersService {
                 [],
                 (error: Error, usersData: IFullUserData[]) => {
                     if (error) {
-                        reject(newBadRequestException(UsersQueryList.GetAllUsers));
+                        return reject(newBadRequestException(UsersQueryList.GetAllUsers));
                     }
 
                     resolve(usersData);
@@ -42,11 +42,11 @@ export class UsersService {
                 [login],
                 (error: Error, usersData: IFullUserData[]) => {
                     if (error) {
-                        reject(newBadRequestException(UsersQueryList.GetUserByLogin));
+                        return reject(newBadRequestException(UsersQueryList.GetUserByLogin));
                     }
 
                     if (!usersData[0]) {
-                        reject(new NotFoundException(`[${UsersQueryList.GetUserByLogin}] User with such login does not exist`));
+                        return reject(new NotFoundException(`[${UsersQueryList.GetUserByLogin}] User with such login does not exist`));
                     }
 
                     resolve(usersData[0]);
@@ -62,11 +62,11 @@ export class UsersService {
                 [userId],
                 (error: Error, usersData: IFullUserData[]) => {
                     if (error) {
-                        reject(newBadRequestException(UsersQueryList.GetUserById));
+                        return reject(newBadRequestException(UsersQueryList.GetUserById));
                     }
 
                     if (!usersData[0]) {
-                        reject(newNotFoundException(UsersQueryList.GetUserById));
+                        return reject(newNotFoundException(UsersQueryList.GetUserById));
                     }
 
                     const user: IUser = getUserFromUserData(usersData[0]);
@@ -84,7 +84,7 @@ export class UsersService {
                 [userId],
                 (error: Error, addingInfo: ISqlSuccessResponse) => {
                     if (error) {
-                        reject(newBadRequestException(UsersQueryList.AddUserEntry));
+                        return reject(newBadRequestException(UsersQueryList.AddUserEntry));
                     }
 
                     resolve(addingInfo);
@@ -100,7 +100,7 @@ export class UsersService {
                 [userPayload.entryId],
                 (error: Error, modifyingInfo: ISqlSuccessResponse) => {
                     if (error) {
-                        reject(newBadRequestException(UsersQueryList.ModiflyUserEntry));
+                        return reject(newBadRequestException(UsersQueryList.ModiflyUserEntry));
                     }
 
                     resolve(modifyingInfo);
@@ -118,12 +118,30 @@ export class UsersService {
                 params,
                 (error: Error, creationInfo: ISqlSuccessResponse) => {
                     if (error) {
-                        reject(newBadRequestException(UsersQueryList.RegisterUser));
+                        return reject(newBadRequestException(UsersQueryList.RegisterUser));
                     }
 
                     resolve(creationInfo);
                 },
             );
+        });
+    }
+
+    public async modifyUser(modifyUserData: any, userId: number): Promise<ISqlSuccessResponse> {
+        const user: IUser = await this.getUserById(userId);
+        const params: NumberOrString[] = this.getUserModifyParams({ ...user, ...modifyUserData });
+
+        return new Promise((resolve, reject) => {
+            db.query(
+                Queries.ModifyUser,
+                params,
+                (error: Error, modifyingInfo: ISqlSuccessResponse) => {
+                    if (error) {
+                        return reject(newBadRequestException(UsersQueryList.ModifyUser));
+                    }
+
+                    resolve(modifyingInfo);
+                });
         });
     }
 
@@ -134,7 +152,7 @@ export class UsersService {
                 [userId],
                 (error: Error, deletingInfo: ISqlSuccessResponse) => {
                     if (error) {
-                        reject(newBadRequestException(UsersQueryList.DeleteUser));
+                        return reject(newBadRequestException(UsersQueryList.DeleteUser));
                     }
 
                     resolve(deletingInfo);
@@ -154,6 +172,22 @@ export class UsersService {
         params.push(registerUserData.educationalInstitution);
         params.push(registerUserData.email);
         params.push(hashedPassword);
+
+        return params;
+    }
+
+    private getUserModifyParams(modifyUserData: IUser): NumberOrString[] {
+        const params: NumberOrString[] = [];
+
+        params.push(
+            modifyUserData.firstName,
+            modifyUserData.lastName,
+            modifyUserData.roleId,
+            modifyUserData.educationalInstitution,
+            modifyUserData.login,
+            modifyUserData.email,
+            modifyUserData.userId,
+        );
 
         return params;
     }

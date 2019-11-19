@@ -5,6 +5,7 @@ export interface ICourseCreationData {
     courseGroupName: string;
     courseDescription: string;
     courseCode: string;
+    addedAt: string;
 }
 
 export interface IJoinCourseData {
