@@ -19,4 +19,7 @@ export class CourseItemDto implements ICourseItem {
 
   @ApiModelProperty({ type: String, required: true })
   public courseItemTextContent: string;
+
+  @ApiModelProperty({ type: String, required: true })
+  public addedAt: string;
 }

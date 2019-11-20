@@ -5,7 +5,6 @@ export interface ICourseCreationData {
     courseGroupName: string;
     courseDescription: string;
     courseCode: string;
-    addedAt: string;
 }
 
 export interface IJoinCourseData {
@@ -38,6 +37,7 @@ export interface ICourseItemData {
     creatorId: number;
     courseItemTitle: string;
     courseItemTextContent: string;
+    addedAt: string;
 }
 
 export interface ICreateCourseItemData {
@@ -54,6 +54,7 @@ export interface IModifyCourseItemData {
 export interface ICourseItem extends ICreateCourseItemData {
     courseItemId: number;
     creator: IUser;
+    addedAt: string;
 }
 
 export interface IFullCourseData extends ICourseData {
