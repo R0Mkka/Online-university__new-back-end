@@ -11,6 +11,10 @@ export interface IJoinCourseData {
     courseCode: string;
 }
 
+export interface IJoinedCourseData {
+    joinedCourseId: number;
+}
+
 export enum CourseModes {
     Private = 0,
     Public = 1,

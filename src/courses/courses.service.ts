@@ -6,7 +6,7 @@ import { CourseItemsService } from '../course-items/course-items.service';
 import { Database } from './../database';
 import { CoursesQueryList, Queries } from './courses.queries';
 
-import { ICourseCreationData, ICourseData, IFullCourseData, ICourseItemData, ICourseItem } from '../models/courses.models';
+import { ICourseCreationData, ICourseData, IFullCourseData, ICourseItemData, ICourseItem, IJoinedCourseData } from '../models/courses.models';
 import { ISqlSuccessResponse } from '../models/common.models';
 import { IUserLikePayload } from '../models/auth.models';
 import { IUser, IFullUserData } from '../models/users.models';
@@ -122,12 +122,16 @@ export class CoursesService {
         });
     }
 
-    public async joinCourse(courseCode: string, userPayload: IUserLikePayload): Promise<ISqlSuccessResponse> {
+    public async joinCourse(courseCode: string, userPayload: IUserLikePayload): Promise<IJoinedCourseData> {
         const course: ICourseData = await this.getCourseByCode(courseCode);
 
         await this.chatsService.createUserChatConnection(course.chatId, userPayload);
 
-        return this.createUserCourseConnection(course.courseId, userPayload);
+        await this.createUserCourseConnection(course.courseId, userPayload);
+
+        return {
+            joinedCourseId: course.courseId,
+        };
     }
 
     public async destroyConnection(courseId: number, userPayload: IUserLikePayload): Promise<ISqlSuccessResponse> {

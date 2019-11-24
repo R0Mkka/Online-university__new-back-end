@@ -17,13 +17,14 @@ import { CoursesService } from './courses.service';
 import { NoStudentsGuard } from '../guards/no-students.guard';
 
 import { IAuthReq } from '../models/auth.models';
-import { ICourseCreationData, IJoinCourseData, ICourseData, IFullCourseData } from '../models/courses.models';
+import { ICourseCreationData, IJoinCourseData, ICourseData, IFullCourseData, IJoinedCourseData } from '../models/courses.models';
 import { ISqlSuccessResponse } from '../models/common.models';
 import { SwaggerTags } from '../constants';
 import { tryNumberParse } from '../helpers';
 import { createCourseOptions, joinCourseOptions } from '../swagger/configs';
 import { CourseDataDto } from '../swagger/classes/course-data';
 import { SuccessResponseDto } from '../swagger/classes/success-response';
+import { JoinedCourseDataDto } from '../swagger/classes/joined-course-data';
 import { FullCourseDataDto } from '../swagger/classes/full-course-data';
 
 @UseGuards(AuthGuard())
@@ -82,13 +83,13 @@ export class CoursesController {
 
     @Post('/join')
     @ApiImplicitBody(joinCourseOptions)
-    @ApiCreatedResponse({ description: 'Course joined successfully', type: SuccessResponseDto })
+    @ApiCreatedResponse({ description: 'Course joined successfully', type: JoinedCourseDataDto })
     @ApiBadRequestResponse({ description: 'There are some problems with input data' })
     @ApiNotFoundResponse({ description: 'Course with such code does not exist' })
     public joinCourse(
         @Body() joinCourseData: IJoinCourseData,
         @Request() req: IAuthReq,
-    ): Promise<ISqlSuccessResponse> {
+    ): Promise<IJoinedCourseData> {
         return this.coursesService.joinCourse(joinCourseData.courseCode, req.user);
     }
 
