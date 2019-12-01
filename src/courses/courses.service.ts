@@ -9,7 +9,7 @@ import { CoursesQueryList, Queries } from './courses.queries';
 import { ICourseCreationData, ICourseData, IFullCourseData, ICourseItemData, ICourseItem, IJoinedCourseData } from '../models/courses.models';
 import { ISqlSuccessResponse } from '../models/common.models';
 import { IUserLikePayload } from '../models/auth.models';
-import { IUser, IFullUserData } from '../models/users.models';
+import { IUser, IFullUserData, Roles } from '../models/users.models';
 import { NumberOrString } from '../models/database.models';
 import { newBadRequestException, getUserFromUserData } from '../helpers';
 
@@ -25,11 +25,27 @@ export class CoursesService {
     public getUserCourseList(userId: number): Promise<ICourseData[]> {
         return new Promise((resolve, reject) => {
             db.query(
-                Queries.GetAllUserCourses,
+                Queries.GetUserCourses,
                 [userId],
                 (error: Error, courses: ICourseData[]) => {
                     if (error) {
-                        reject(newBadRequestException(CoursesQueryList.GetAllUserCourses));
+                        return reject(newBadRequestException(CoursesQueryList.GetUserCourses));
+                    }
+
+                    resolve(courses);
+                },
+            );
+        });
+    }
+
+    public getAllCourses(): Promise<ICourseData[]> {
+        return new Promise((resolve, reject) => {
+            db.query(
+                Queries.GetAllCourses,
+                [],
+                (error: Error, courses: ICourseData[]) => {
+                    if (error) {
+                        return reject(newBadRequestException(CoursesQueryList.GetAllCourses));
                     }
 
                     resolve(courses);
@@ -103,7 +119,7 @@ export class CoursesService {
             throw new NotFoundException(`[${CoursesQueryList.RemoveCourse}] Course does not exist`);
         }
 
-        if (course.courseOwnerId !== userPayload.userId) {
+        if (userPayload.roleId === Roles.Teacher && course.courseOwnerId !== userPayload.userId) {
             throw new ForbiddenException(`[${CoursesQueryList.RemoveCourse}] Course can be removed only by its owner`);
         }
 

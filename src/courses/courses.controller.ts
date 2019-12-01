@@ -44,6 +44,13 @@ export class CoursesController {
         return this.coursesService.getUserCourseList(req.user.userId);
     }
 
+    // TODO: Swagger
+    // TODO: Admin access
+    @Get('/all')
+    public getAllCourses(): Promise<ICourseData[]> {
+        return this.coursesService.getAllCourses();
+    }
+
     // TODO: Think about getting courses only when users are in them
     @Get(':courseId')
     @ApiOkResponse({ description: 'Course full data', type: FullCourseDataDto })
@@ -71,7 +78,7 @@ export class CoursesController {
     @Delete(':courseId')
     @ApiOkResponse({ description: 'Course was removed (if existed)', type: SuccessResponseDto })
     @ApiBadRequestResponse({ description: 'Id value type is incorrect' })
-    @ApiForbiddenResponse({ description: 'Only Teachers and Admins have the opportunity to create courses' })
+    @ApiForbiddenResponse({ description: 'Only Teachers and Admins have the opportunity to delete courses' })
     public removeCourse(
         @Param('courseId') courseIdAsString: string,
         @Request() req: IAuthReq,

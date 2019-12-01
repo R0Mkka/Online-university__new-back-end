@@ -1,7 +1,8 @@
 import { DBTables } from '../constants';
 
 export enum CoursesQueryList {
-    GetAllUserCourses = 'GetAllUserCourses',
+    GetUserCourses = 'GetUserCourses',
+    GetAllCourses = 'GetAllCourses',
     CreateCourse = 'CreateCourse',
     RemoveCourse = 'RemoveCourse',
     GenerateCourseData = 'GenerateCourseData',
@@ -14,7 +15,7 @@ export enum CoursesQueryList {
 }
 
 export const Queries: { [key in CoursesQueryList]: string } = {
-    GetAllUserCourses: `
+    GetUserCourses: `
         SELECT
             ${DBTables.Courses}.courseId,
             ${DBTables.Courses}.courseOwnerId,
@@ -41,6 +42,34 @@ export const Queries: { [key in CoursesQueryList]: string } = {
         LEFT JOIN ${DBTables.CoursesColorPalettes}
             USING(courseColorPaletteId)
         WHERE ${DBTables.UsersCourses}.userId = ?;
+    `,
+    GetAllCourses: `
+        SELECT
+            ${DBTables.Courses}.courseId,
+            ${DBTables.Courses}.courseOwnerId,
+            CONCAT(${DBTables.Users}.firstName, ' ', ${DBTables.Users}.lastName) courseOwnerFullName,
+            ${DBTables.Courses}.chatId,
+            ${DBTables.Courses}.courseName,
+            ${DBTables.Courses}.courseGroupName,
+            ${DBTables.Courses}.courseDescription,
+            ${DBTables.Courses}.courseCode,
+            ${DBTables.Courses}.addedAt courseCreatedAt,
+            ${DBTables.CoursesPictures}.pictureName,
+            ${DBTables.CoursesColorPalettes}.colorPaletteName,
+            ${DBTables.CoursesData}.courseMode
+        FROM
+            ${DBTables.UsersCourses}
+        LEFT JOIN ${DBTables.Courses}
+            USING(courseId)
+        LEFT JOIN ${DBTables.Users}
+            ON ${DBTables.Courses}.courseOwnerId = ${DBTables.Users}.userId
+        LEFT JOIN ${DBTables.CoursesData}
+            USING(courseDataId)
+        LEFT JOIN ${DBTables.CoursesPictures}
+            USING(coursePictureId)
+        LEFT JOIN ${DBTables.CoursesColorPalettes}
+            USING(courseColorPaletteId)
+        GROUP BY ${DBTables.Courses}.courseId;
     `,
     CreateCourse: `
         INSERT INTO ${DBTables.Courses} (
