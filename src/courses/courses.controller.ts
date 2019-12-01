@@ -1,4 +1,4 @@
-import { Controller, UseGuards, Get, Request, Post, Delete, Param, Body, BadRequestException } from '@nestjs/common';
+import { Controller, UseGuards, Get, Request, Post, Patch, Delete, Param, Body } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import {
     ApiBearerAuth,
@@ -17,7 +17,7 @@ import { CoursesService } from './courses.service';
 import { NoStudentsGuard } from '../guards/no-students.guard';
 
 import { IAuthReq } from '../models/auth.models';
-import { ICourseCreationData, IJoinCourseData, ICourseData, IFullCourseData, IJoinedCourseData } from '../models/courses.models';
+import { ICourseCreationData, IJoinCourseData, ICourseData, IFullCourseData, IJoinedCourseData, IModifyCourseData } from '../models/courses.models';
 import { ISqlSuccessResponse } from '../models/common.models';
 import { SwaggerTags } from '../constants';
 import { tryNumberParse } from '../helpers';
@@ -72,6 +72,18 @@ export class CoursesController {
         @Request() req: IAuthReq,
     ): Promise<ISqlSuccessResponse> {
         return this.coursesService.createCourse(courseCreationInfo, req.user);
+    }
+
+    // TODO: Swagger
+    // TODO: Admin access
+    @Patch(':courseId')
+    public modifyCourse(
+        @Body() modifyCourseData: IModifyCourseData,
+        @Param('courseId') courseIdAsString: string,
+    ): Promise<ISqlSuccessResponse> {
+        const courseId: number = tryNumberParse(courseIdAsString);
+
+        return this.coursesService.modifyCourse(modifyCourseData, courseId);
     }
 
     @UseGuards(NoStudentsGuard)

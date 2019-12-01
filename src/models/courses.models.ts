@@ -65,3 +65,10 @@ export interface IFullCourseData extends ICourseData {
     courseItems: ICourseItem[];
     users: IUser[];
 }
+
+export interface IModifyCourseData {
+    courseName?: string;
+    courseGroupName?: string;
+    courseDescription?: string;
+    courseCode?: string;
+}

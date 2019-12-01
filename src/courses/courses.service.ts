@@ -6,7 +6,7 @@ import { CourseItemsService } from '../course-items/course-items.service';
 import { Database } from './../database';
 import { CoursesQueryList, Queries } from './courses.queries';
 
-import { ICourseCreationData, ICourseData, IFullCourseData, ICourseItemData, ICourseItem, IJoinedCourseData } from '../models/courses.models';
+import { ICourseCreationData, ICourseData, IFullCourseData, ICourseItemData, ICourseItem, IJoinedCourseData, IModifyCourseData } from '../models/courses.models';
 import { ISqlSuccessResponse } from '../models/common.models';
 import { IUserLikePayload } from '../models/auth.models';
 import { IUser, IFullUserData, Roles } from '../models/users.models';
@@ -112,6 +112,24 @@ export class CoursesService {
         });
     }
 
+    public async modifyCourse(modifyCourseData: IModifyCourseData, courseId: number): Promise<ISqlSuccessResponse> {
+        const courseData: ICourseData = await this.getCourseById(courseId);
+
+        return new Promise((resolve, reject) => {
+            db.query(
+                Queries.ModifyCourse,
+                this.getCourseModifyParams({ ...courseData, ...modifyCourseData }),
+                (error: Error, modifyingInfo: ISqlSuccessResponse) => {
+                    if (error) {
+                        return reject(newBadRequestException(CoursesQueryList.ModifyCourse));
+                    }
+
+                    resolve(modifyingInfo);
+                },
+            );
+        });
+    }
+
     public async removeCourse(courseId: number, userPayload: IUserLikePayload): Promise<ISqlSuccessResponse> {
         const course: ICourseData = await this.getCourseById(courseId);
 
@@ -151,13 +169,17 @@ export class CoursesService {
     }
 
     public async destroyConnection(courseId: number, userPayload: IUserLikePayload): Promise<ISqlSuccessResponse> {
+        const course: ICourseData = await this.getCourseById(courseId);
+
+        await this.destroyUserChatConnection(course, userPayload);
+
         return new Promise((resolve, reject) => {
             db.query(
                 Queries.DestroyUserCourseConnection,
                 [userPayload.userId, courseId],
                 (error: Error, destroyingInfo: ISqlSuccessResponse) => {
                     if (error) {
-                        reject(newBadRequestException(CoursesQueryList.DestroyUserCourseConnection));
+                        return reject(newBadRequestException(CoursesQueryList.DestroyUserCourseConnection));
                     }
 
                     resolve(destroyingInfo);
@@ -297,5 +319,35 @@ export class CoursesService {
                 },
             );
         });
+    }
+
+    private destroyUserChatConnection(course: ICourseData, userPayload: IUserLikePayload): Promise<ISqlSuccessResponse> {
+        return new Promise((resolve, reject) => {
+            db.query(
+                Queries.DestroyUserChatConnection,
+                [userPayload.userId, course.chatId],
+                (error: Error, destroyingInfo: ISqlSuccessResponse) => {
+                    if (error) {
+                        return reject(newBadRequestException(CoursesQueryList.DestroyUserChatConnection));
+                    }
+
+                    resolve(destroyingInfo);
+                },
+            );
+        });
+    }
+
+    private getCourseModifyParams(modifyCourseData: ICourseData): NumberOrString[] {
+        const params: NumberOrString[] = [];
+
+        params.push(
+            modifyCourseData.courseName,
+            modifyCourseData.courseGroupName,
+            modifyCourseData.courseDescription,
+            modifyCourseData.courseCode,
+            modifyCourseData.courseId,
+        );
+
+        return params;
     }
 }

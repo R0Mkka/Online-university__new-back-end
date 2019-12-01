@@ -129,7 +129,7 @@ export class UsersService {
         });
     }
 
-    public async modifyUser(modifyUserData: any, userId: number): Promise<ISqlSuccessResponse> {
+    public async modifyUser(modifyUserData: any, userId: number): Promise<ISqlSuccessResponse> { // TODO: Type
         const user: IUser = await this.getUserById(userId);
         const params: NumberOrString[] = this.getUserModifyParams({ ...user, ...modifyUserData });
 
