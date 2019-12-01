@@ -1,5 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
+import * as fs from 'fs';
+import * as path from 'path';
 
 import { Database } from '../database';
 import { UsersQueryList, Queries } from './users.queries';
@@ -146,6 +148,16 @@ export class UsersService {
     }
 
     public async deleteUser(userId: number): Promise<ISqlSuccessResponse> {
+        const user: IUser = await this.getUserById(userId);
+
+        if (!!user.avatar.id) {
+            const filePath: string = path.join(__dirname, '../', '../', 'files', user.avatar.name);
+
+            fs.unlink(filePath, (error: Error) => {
+                return Promise.reject(error);
+            });
+        }
+
         return new Promise((resolve, reject) => {
             db.query(
                 Queries.DeleteUser,
