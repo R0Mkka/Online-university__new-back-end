@@ -8,6 +8,7 @@ export enum UsersQueryList {
     ModiflyUserEntry = 'ModiflyUserEntry',
     RegisterUser = 'RegisterUser',
     ModifyUser = 'ModifyUser',
+    ChangeUserPassword = 'ChangeUserPassword',
     DeleteUser = 'DeleteUser',
 }
 
@@ -104,6 +105,15 @@ export const Queries: { [key in UsersQueryList]: string } = {
             educationalInstitution = ?,
             login = ?,
             email = ?
+        WHERE
+            userId = ?;
+    `,
+
+    ChangeUserPassword: `
+        UPDATE
+            ${DBTables.Users}
+        SET
+            password = ?
         WHERE
             userId = ?;
     `,

@@ -32,6 +32,7 @@ export class UsersController {
     ) {}
 
     // TODO: Add guard for only Admin access
+        // TODO: Swagger
     @Get()
     @ApiOkResponse({ description: 'User list', type: [UserDto] })
     public getUserList(): Promise<IUser[]> {
@@ -54,6 +55,15 @@ export class UsersController {
     @ApiBadRequestResponse({ description: 'There are some problems with input data' })
     public registerUser(@Body() registerUserData: IRegisterUserData): Promise<ISqlSuccessResponse> {
         return this.usersService.registerUser(registerUserData);
+    }
+
+    // TODO: Swagger
+    @Post(':userLogin/change-password')
+    public changeUserPassword(
+        @Body() changePasswordObject: any, // TODO: Type
+        @Param('userLogin') userLogin: string,
+    ): Promise<ISqlSuccessResponse> {
+        return this.usersService.changeUserPassword(changePasswordObject, userLogin);
     }
 
     // TODO: Swagger

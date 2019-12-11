@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException, ForbiddenException } from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
 import * as fs from 'fs';
 import * as path from 'path';
@@ -143,7 +143,32 @@ export class UsersService {
                     }
 
                     resolve(modifyingInfo);
-                });
+                },
+            );
+        });
+    }
+
+    public async changeUserPassword(changePasswordObject: any, userLogin: string): Promise<any> { // TODO: Type
+        const userData: IFullUserData = await this.getUserByLogin(userLogin);
+
+        if (!await bcrypt.compare(changePasswordObject.oldPassword, userData.password)) {
+            return Promise.reject(new ForbiddenException('Incorrect password'));
+        }
+
+        const hashedPassword = await bcrypt.hash(changePasswordObject.newPassword, 10);
+
+        return new Promise((resolve, reject) => {
+            db.query(
+                Queries.ChangeUserPassword,
+                [hashedPassword, userData.userId],
+                (error: Error, changingInfo: ISqlSuccessResponse) => {
+                    if (error) {
+                        return reject(newBadRequestException(UsersQueryList.ChangeUserPassword));
+                    }
+
+                    resolve(changingInfo);
+                },
+            );
         });
     }
 
