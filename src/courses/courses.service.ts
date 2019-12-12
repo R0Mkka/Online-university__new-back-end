@@ -54,6 +54,35 @@ export class CoursesService {
         });
     }
 
+    public getAllCoursesFullData(): Promise<any> {
+        return new Promise((resolve, reject) => {
+            db.query(
+                Queries.GetAllCourses,
+                [],
+                (error: Error, courses: ICourseData[]) => {
+                    if (error) {
+                        return reject(newBadRequestException(CoursesQueryList.GetAllCourses));
+                    }
+
+                    resolve(courses);
+                },
+            );
+        })
+        .then(async (courses: ICourseData[]) => { // TODO: Change select way
+            const newCourses: any[] = [];
+
+            for (const course of courses) {
+                newCourses.push({
+                    ...course,
+                    users: await this.getCourseUsers(course.courseId),
+                    courseItems: await this.getCourseContent(course.courseId),
+                });
+            }
+
+            return newCourses;
+        });
+    }
+
     public async getFullCourseData(courseId: number): Promise<IFullCourseData> {
         const courseWithoutContent: ICourseData = await this.getCourseById(courseId);
         const courseItems: ICourseItem[] = await this.getCourseContent(courseId);

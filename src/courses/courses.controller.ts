@@ -51,6 +51,13 @@ export class CoursesController {
         return this.coursesService.getAllCourses();
     }
 
+    // TODO: Swagger
+    // TODO: Admin access
+    @Get('/full')
+    public getAllCoursesFullData(): Promise<any> {
+        return this.coursesService.getAllCoursesFullData();
+    }
+
     // TODO: Think about getting courses only when users are in them
     @Get(':courseId')
     @ApiOkResponse({ description: 'Course full data', type: FullCourseDataDto })

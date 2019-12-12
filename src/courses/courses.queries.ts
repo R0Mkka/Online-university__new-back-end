@@ -3,6 +3,7 @@ import { DBTables } from '../constants';
 export enum CoursesQueryList {
     GetUserCourses = 'GetUserCourses',
     GetAllCourses = 'GetAllCourses',
+    GetAllCoursesFullData = 'GetAllCoursesFullData',
     CreateCourse = 'CreateCourse',
     ModifyCourse = 'ModifyCourse',
     RemoveCourse = 'RemoveCourse',
@@ -72,6 +73,31 @@ export const Queries: { [key in CoursesQueryList]: string } = {
         LEFT JOIN ${DBTables.CoursesColorPalettes}
             USING(courseColorPaletteId)
         GROUP BY ${DBTables.Courses}.courseId;
+    `,
+    GetAllCoursesFullData: `
+        SELECT
+            ${DBTables.Courses}.courseId,
+            ${DBTables.Courses}.courseOwnerId,
+            CONCAT(${DBTables.Users}.firstName, ' ', ${DBTables.Users}.lastName) courseOwnerFullName,
+            ${DBTables.Courses}.chatId,
+            ${DBTables.Courses}.courseName,
+            ${DBTables.Courses}.courseGroupName,
+            ${DBTables.Courses}.courseDescription,
+            ${DBTables.Courses}.courseCode,
+            ${DBTables.Courses}.addedAt courseCreatedAt,
+            ${DBTables.CoursesPictures}.pictureName,
+            ${DBTables.CoursesColorPalettes}.colorPaletteName,
+            ${DBTables.CoursesData}.courseMode
+        FROM
+            ${DBTables.Courses}
+        LEFT JOIN ${DBTables.Users}
+            ON ${DBTables.Courses}.courseOwnerId = ${DBTables.Users}.userId
+        LEFT JOIN ${DBTables.CoursesData}
+            USING(courseDataId)
+        LEFT JOIN ${DBTables.CoursesPictures}
+            USING(coursePictureId)
+        LEFT JOIN ${DBTables.CoursesColorPalettes}
+            USING(courseColorPaletteId);
     `,
     CreateCourse: `
         INSERT INTO ${DBTables.Courses} (
