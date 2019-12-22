@@ -95,7 +95,7 @@ export class CoursesService {
         };
     }
 
-    public async createCourse(courseDto: ICourseCreationData, userPayload: IUserLikePayload): Promise<ISqlSuccessResponse> {
+    public async createCourse(courseDto: ICourseCreationData, userPayload: IUserLikePayload): Promise<any> {
         const chatName: string = `Чат курса '${courseDto.courseName}'`;
 
         try {
@@ -136,8 +136,12 @@ export class CoursesService {
                 );
             });
         })
-        .then((courseCreationInfo: ISqlSuccessResponse) => {
-            return this.createUserCourseConnection(courseCreationInfo.insertId, userPayload);
+        .then(async (courseCreationInfo: ISqlSuccessResponse) => {
+            await this.createUserCourseConnection(courseCreationInfo.insertId, userPayload);
+
+            return {
+                createdCourseId: courseCreationInfo.insertId,
+            };
         });
     }
 
@@ -212,6 +216,23 @@ export class CoursesService {
                     }
 
                     resolve(destroyingInfo);
+                },
+            );
+        });
+    }
+
+    // TODO
+    public deleteStudentFromCourse(courseId: number, studentId: number): Promise<ISqlSuccessResponse> {
+        return new Promise((resolve, reject) => {
+            db.query(
+                Queries.DeleteStudentFromCourse,
+                [studentId, courseId],
+                (error: Error, deletedStudentInfo: ISqlSuccessResponse) => {
+                    if (error) {
+                        reject(newBadRequestException(CoursesQueryList.DeleteStudentFromCourse));
+                    }
+
+                    resolve(deletedStudentInfo);
                 },
             );
         });

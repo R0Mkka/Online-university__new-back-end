@@ -1,4 +1,4 @@
-import { Controller, UseGuards, Get, Request, Post, Patch, Delete, Param, Body } from '@nestjs/common';
+import { Controller, UseGuards, Get, Request, Post, Patch, Delete, Param, Body, Query } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import {
     ApiBearerAuth,
@@ -129,5 +129,17 @@ export class CoursesController {
         const courseId: number = tryNumberParse(courseIdAsString);
 
         return this.coursesService.destroyConnection(courseId, req.user);
+    }
+
+    // TODO
+    @Delete('/delete-student/:courseId')
+    public deleteStudentFromCourse(
+        @Param('courseId') courseIdAsString: string,
+        @Query() query: { studentIdAsString: string },
+    ): any {
+        const courseId = tryNumberParse(courseIdAsString);
+        const studentId = tryNumberParse(query.studentIdAsString);
+
+        return this.coursesService.deleteStudentFromCourse(courseId, studentId);
     }
 }

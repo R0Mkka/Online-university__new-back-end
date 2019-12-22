@@ -10,6 +10,7 @@ export enum CoursesQueryList {
     GenerateCourseData = 'GenerateCourseData',
     CreateUserCourseConnection = 'CreateUserCourseConnection',
     DestroyUserCourseConnection = 'DestroyUserCourseConnection',
+    DeleteStudentFromCourse = 'DeleteStudentFromCourse',
     DestroyUserChatConnection = 'DestroyUserChatConnection',
     GetCourseByCode = 'GetCourseByCode',
     GetCourseById = 'GetCourseById',
@@ -137,6 +138,11 @@ export const Queries: { [key in CoursesQueryList]: string } = {
         ) VALUES (?,?);
     `,
     DestroyUserCourseConnection: `
+        DELETE
+        FROM ${DBTables.UsersCourses}
+        WHERE userId = ? AND courseId = ?;
+    `,
+    DeleteStudentFromCourse: `
         DELETE
         FROM ${DBTables.UsersCourses}
         WHERE userId = ? AND courseId = ?;
