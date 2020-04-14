@@ -1,4 +1,4 @@
-import { Controller, UseGuards, Post, Get, UseInterceptors, UploadedFile, Param, Response, Request, NotFoundException } from '@nestjs/common';
+import { Controller, UseGuards, Post, Get, UseInterceptors, UploadedFile, Param, Response, Request } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { FileInterceptor } from '@nestjs/platform-express';
 import {
