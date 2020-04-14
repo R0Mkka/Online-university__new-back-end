@@ -12,8 +12,8 @@ async function bootstrap() {
   app.use(helmet());
   app.enableCors(); // TODO: Cors settings
 
-  app.use(json({ limit: '5mb' }));
-  app.use(urlencoded({ limit: '5mb', extended: true }));
+  app.use(json({ limit: '3mb' }));
+  app.use(urlencoded({ limit: '3mb', extended: true }));
 
   Swagger.setup(app);
 

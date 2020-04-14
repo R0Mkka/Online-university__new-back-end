@@ -5,7 +5,7 @@ import * as mime from 'mime';
 
 import { IFile } from '../models/upload.models';
 
-const MAX_FILE_SIZE: number = 5000000;
+const MAX_FILE_SIZE: number = 3000000;
 
 const COMMON_LIMITS = {
   fileSize: MAX_FILE_SIZE,
@@ -34,7 +34,7 @@ export const imagesOptions: MulterOptions = {
     destination,
     filename: (_, image: IFile, callback) => {
       if (image.size > MAX_FILE_SIZE) {
-        callback(new PayloadTooLargeException('Maximum image size is 5mb!'));
+        callback(new PayloadTooLargeException(`Maximum image size is ${MAX_FILE_SIZE / 1000000}mb!`));
       }
 
       if (!['image/jpeg', 'image/png'].includes(image.mimetype)) {

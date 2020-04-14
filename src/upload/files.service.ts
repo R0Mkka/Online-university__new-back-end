@@ -12,7 +12,7 @@ import { IFile } from '../models/upload.models';
 import { IUserLikePayload } from '../models/auth.models';
 import { ISqlSuccessResponse } from '../models/common.models';
 import { NumberOrString } from '../models/database.models';
-import { newBadRequestException } from '../helpers';
+import { newBadRequestException, newNotFoundException } from '../helpers';
 
 const db = Database.getInstance();
 
@@ -22,11 +22,25 @@ export class FilesService {
     private readonly usersService: UsersService,
   ) {}
 
+  public getFileByName(fileName: string): Promise<string> {
+    return new Promise((resolve, reject) => {
+      const filePath: string = this.getFilePath(fileName);
+
+      fs.exists(filePath, (exists: boolean) => {
+        if (!exists) {
+          return reject(newNotFoundException('GetFileByName'));
+        }
+
+        resolve(filePath);
+      });
+    });
+  }
+
   public async uploadUserAvatar(avatar: IFile, userPayload: IUserLikePayload): Promise<IFile> {
     const user: IUser = await this.usersService.getUserById(userPayload.userId);
 
     if (!!user.avatar.id) {
-      const filePath: string = path.join(__dirname, '../', '../', 'files', user.avatar.name);
+      const filePath: string = this.getFilePath(user.avatar.name);
 
       fs.unlink(filePath, (error: Error) => {
         return Promise.reject(error);
@@ -53,6 +67,10 @@ export class FilesService {
 
       return avatar;
     });
+  }
+
+  private getFilePath(fileName: string): string {
+    return path.join(__dirname, '../', '../', 'files', fileName);
   }
 
   private getUploadUserAvatarParams(avatar: IFile): NumberOrString[] {

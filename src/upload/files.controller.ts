@@ -1,4 +1,4 @@
-import { Controller, UseGuards, Post, Get, UseInterceptors, UploadedFile, Param, Response, Request } from '@nestjs/common';
+import { Controller, UseGuards, Post, Get, UseInterceptors, UploadedFile, Param, Response, Request, NotFoundException } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { FileInterceptor } from '@nestjs/platform-express';
 import {
@@ -30,13 +30,13 @@ export class FilesController {
   ) {}
 
   @Get(':fileName')
-  public getFile(
+  public async getFile(
     @Param('fileName') fileName: string,
     @Response() res,
-  ): IFile {
-    return res.sendFile(fileName, {
-      root: 'files',
-    });
+  ): Promise<IFile> {
+    const filePath: string = await this.filesService.getFileByName(fileName);
+
+    return res.sendFile(filePath);
   }
 
   @Post()
