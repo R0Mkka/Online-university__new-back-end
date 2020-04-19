@@ -170,7 +170,6 @@ export const Queries: { [key in CoursesQueryList]: string } = {
             ${DBTables.Users}.email,
             ${DBTables.Users}.password,
             ${DBTables.Users}.registeredAt,
-            ${DBTables.UsersEntries}.userEntryId entryId,
             ${DBTables.UsersEntries}.userStatusId statusId,
             ${DBTables.UsersEntries}.enteredAt,
             ${DBTables.UsersEntries}.leftAt,

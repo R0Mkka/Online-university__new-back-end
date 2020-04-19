@@ -64,3 +64,11 @@ export interface IRegisterUserData {
     email: string;
     password: string;
 }
+
+export interface IUserIdObject {
+    userId: number;
+}
+
+export interface IUserEntryIdObject {
+    userEntryId: number;
+}

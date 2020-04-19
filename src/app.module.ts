@@ -8,6 +8,7 @@ import { CoursesModule } from './courses/courses.module';
 import { CourseItems } from './course-items/course-items.module';
 import { ChatsModule } from './chats/chats.module';
 import { FilesModule } from './upload/files.module';
+import { WebsocketsModule } from './websockets/websockets.module';
 
 import { AppController } from './app.controller';
 
@@ -20,6 +21,7 @@ import { AppController } from './app.controller';
     CourseItems,
     ChatsModule,
     FilesModule,
+    WebsocketsModule,
   ],
   controllers: [AppController],
   providers: [

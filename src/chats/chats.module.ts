@@ -2,8 +2,7 @@ import { Module } from '@nestjs/common';
 import { PassportModule } from '@nestjs/passport';
 
 import { ChatsService } from './chats.service';
-import { ChatsGatewayService } from './chats-gateway.service';
-import { ChatsGateway } from './chats.gateway';
+import { UsersService } from '../users/users.service';
 
 import { ChatsController } from './chats.controller';
 
@@ -16,8 +15,7 @@ import { ChatsController } from './chats.controller';
     ],
     providers: [
         ChatsService,
-        ChatsGatewayService,
-        ChatsGateway,
+        UsersService,
     ],
 })
 export class ChatsModule {}

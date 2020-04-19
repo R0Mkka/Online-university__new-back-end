@@ -6,10 +6,9 @@ import * as path from 'path';
 import { Database } from '../database';
 import { UsersQueryList, Queries } from './users.queries';
 
-import { IUser, IFullUserData, IRegisterUserData } from '../models/users.models';
+import { IUser, IFullUserData, IRegisterUserData, IUserEntryIdObject } from '../models/users.models';
 import { ISqlSuccessResponse } from '../models/common.models';
 import { NumberOrString } from '../models/database.models';
-import { IUserLikePayload } from '../models/auth.models';
 import { getUserFromUserData, newBadRequestException, newNotFoundException } from '../helpers';
 
 const db = Database.getInstance();
@@ -79,11 +78,29 @@ export class UsersService {
         });
     }
 
-    public addUserEntry(userId: number): Promise<ISqlSuccessResponse> {
+    public getUserEntryIdByConnectionId(connectionId: string): Promise<any> {
+        return new Promise((resolve, reject) => {
+            db.query(
+                Queries.GetUserEntryIdByConnectionId,
+                [connectionId],
+                (error: Error, userEntriesIdObjects: IUserEntryIdObject[]) => {
+                    const userEntryIdObject: IUserEntryIdObject = userEntriesIdObjects[0];
+
+                    if (error || !userEntryIdObject) {
+                        return reject(newNotFoundException(UsersQueryList.GetUserEntryIdByConnectionId));
+                    }
+
+                    resolve(userEntryIdObject);
+                },
+            );
+        });
+    }
+
+    public addUserEntry(userId: number, connectionId: string): Promise<ISqlSuccessResponse> {
         return new Promise((resolve, reject) => {
             db.query(
                 Queries.AddUserEntry,
-                [userId],
+                [userId, connectionId],
                 (error: Error, addingInfo: ISqlSuccessResponse) => {
                     if (error) {
                         return reject(newBadRequestException(UsersQueryList.AddUserEntry));
@@ -95,17 +112,17 @@ export class UsersService {
         });
     }
 
-    public logoutUser(userPayload: IUserLikePayload): Promise<ISqlSuccessResponse> {
+    public markUserAsOffline(connectionId: string): Promise<any> {
         return new Promise((resolve, reject) => {
             db.query(
-                Queries.ModiflyUserEntry,
-                [userPayload.entryId],
-                (error: Error, modifyingInfo: ISqlSuccessResponse) => {
+                Queries.ModifyUserEntry,
+                [connectionId],
+                (error: Error, modifyData: ISqlSuccessResponse) => {
                     if (error) {
-                        return reject(newBadRequestException(UsersQueryList.ModiflyUserEntry));
+                        return reject(newBadRequestException(UsersQueryList.ModifyUser));
                     }
 
-                    resolve(modifyingInfo);
+                    resolve(modifyData);
                 },
             );
         });

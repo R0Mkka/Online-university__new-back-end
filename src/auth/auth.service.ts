@@ -36,9 +36,6 @@ export class AuthService {
     email,
     registeredAt,
   }: IUserLikePayload): Promise<ITokenObject> {
-
-    const res: ISqlSuccessResponse = await this.usersService.addUserEntry(userId);
-
     const payload: ITokenSignPayload = {
       sub: userId,
       roleId,
@@ -48,7 +45,6 @@ export class AuthService {
       educationalInstitution,
       email,
       registeredAt,
-      entryId: res.insertId,
     };
 
     return {
@@ -57,6 +53,6 @@ export class AuthService {
   }
 
   public logout(userPayload: IUserLikePayload): Promise<ISqlSuccessResponse> {
-    return this.usersService.logoutUser(userPayload);
+    return null; // TODO
   }
 }

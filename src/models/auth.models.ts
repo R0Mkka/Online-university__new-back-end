@@ -21,7 +21,6 @@ export interface ITokenSignPayload {
   educationalInstitution: string;
   email: string;
   registeredAt: string;
-  entryId: number;
 }
 
 export interface IUserLikePayload {
@@ -33,5 +32,4 @@ export interface IUserLikePayload {
   educationalInstitution: string;
   email: string;
   registeredAt: string;
-  entryId: number;
 }

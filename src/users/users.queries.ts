@@ -4,8 +4,9 @@ export enum UsersQueryList {
     GetAllUsers = 'GetAllUsers',
     GetUserByLogin = 'GetUserByLogin',
     GetUserById = 'GetUserById',
+    GetUserEntryIdByConnectionId = 'GetUserEntryIdByConnectionId',
     AddUserEntry = 'AddUserEntry',
-    ModiflyUserEntry = 'ModiflyUserEntry',
+    ModifyUserEntry = 'ModifyUserEntry',
     RegisterUser = 'RegisterUser',
     ModifyUser = 'ModifyUser',
     DeleteUser = 'DeleteUser',
@@ -22,7 +23,6 @@ const GET_USERS_FULL_INFO = `
         ${DBTables.Users}.email,
         ${DBTables.Users}.password,
         ${DBTables.Users}.registeredAt,
-        ${DBTables.UsersEntries}.userEntryId entryId,
         ${DBTables.UsersEntries}.userStatusId statusId,
         ${DBTables.UsersEntries}.enteredAt,
         ${DBTables.UsersEntries}.leftAt,
@@ -67,19 +67,30 @@ export const Queries: { [key in UsersQueryList]: string } = {
         WHERE ${DBTables.Users}.userId = ?;
     `,
 
-    AddUserEntry: `
-        INSERT INTO ${DBTables.UsersEntries} (
-            userId
-        ) VALUES (?);
+    GetUserEntryIdByConnectionId: `
+        SELECT
+            userEntryId
+        FROM
+            ${DBTables.UsersEntries}
+        WHERE
+            connectionId = ?;
     `,
 
-    ModiflyUserEntry: `
+    AddUserEntry: `
+        INSERT INTO ${DBTables.UsersEntries} (
+            userId,
+            connectionId
+        ) VALUES (?,?);
+    `,
+
+    ModifyUserEntry: `
         UPDATE
             ${DBTables.UsersEntries}
         SET
-            leftAt = CURRENT_TIMESTAMP
+            leftAt = CURRENT_TIMESTAMP,
+            userStatusId = 2
         WHERE
-            userEntryId = ?;
+            connectionId = ?;
     `,
 
     RegisterUser: `
