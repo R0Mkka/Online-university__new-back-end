@@ -75,8 +75,6 @@ export const Queries: { [key in ChatQueryList]: string } = {
             ${DBTables.Users}.password,
             ${DBTables.Users}.registeredAt,
             ${DBTables.UsersEntries}.userStatusId statusId,
-            ${DBTables.UsersEntries}.enteredAt,
-            ${DBTables.UsersEntries}.leftAt,
             ${DBTables.AccountImages}.accountImageId avatarId,
             ${DBTables.AccountImages}.path avatarPath,
             ${DBTables.AccountImages}.name avatarName,

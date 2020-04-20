@@ -36,12 +36,6 @@ export class UserDto implements IUser {
     public statusId: UserStatuses;
 
     @ApiModelProperty({ type: String, required: true })
-    public enteredAt: string;
-
-    @ApiModelProperty({ type: String, required: true })
-    public leftAt: string;
-
-    @ApiModelProperty({ type: String, required: true })
     public themeName: string;
 
     @ApiModelProperty({ type: String, required: true })
