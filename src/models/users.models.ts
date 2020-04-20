@@ -1,4 +1,4 @@
-import { IFile } from './common.models';
+import { IFile, IShortFile } from './common.models';
 
 export enum Roles {
     Teacher = 1,
@@ -49,6 +49,30 @@ export interface IUser {
     themeName: string;
     languageName: string;
     avatar: IFile;
+}
+
+export interface IFullCourseUserData {
+    userId: number;
+    roleId: Roles;
+    firstName: string;
+    lastName: string;
+    email: string;
+    registeredAt: string;
+    statusId: UserStatuses;
+    avatarId: number;
+    avatarName: string;
+    avatarMimeType: string;
+}
+
+export interface ICourseUser {
+    userId: number;
+    roleId: Roles;
+    firstName: string;
+    lastName: string;
+    email: string;
+    registeredAt: string;
+    statusId: UserStatuses;
+    avatar: IShortFile;
 }
 
 export interface IRegisterUserData {

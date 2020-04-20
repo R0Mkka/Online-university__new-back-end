@@ -9,9 +9,9 @@ import { CoursesQueryList, Queries } from './courses.queries';
 import { ICourseCreationData, ICourseData, IFullCourseData, ICourseItemData, ICourseItem, IJoinedCourseData } from '../models/courses.models';
 import { ISqlSuccessResponse } from '../models/common.models';
 import { IUserLikePayload } from '../models/auth.models';
-import { IUser, IFullUserData, Roles } from '../models/users.models';
+import { Roles, IFullCourseUserData, ICourseUser } from '../models/users.models';
 import { NumberOrString } from '../models/database.models';
-import { newBadRequestException, getUserFromUserData } from '../helpers';
+import { newBadRequestException, getCourseUserFromUserData } from '../helpers';
 
 const db = Database.getInstance();
 
@@ -57,12 +57,12 @@ export class CoursesService {
     public async getFullCourseData(courseId: number): Promise<IFullCourseData> {
         const courseWithoutContent: ICourseData = await this.getCourseById(courseId);
         const courseItems: ICourseItem[] = await this.getCourseContent(courseId);
-        const users: IUser[] = await this.getCourseUsers(courseId);
+        const courseUsers: ICourseUser[] = await this.getCourseUsers(courseId);
 
         return {
             ...courseWithoutContent,
             courseItems,
-            users,
+            courseUsers,
         };
     }
 
@@ -281,18 +281,18 @@ export class CoursesService {
         });
     }
 
-    private getCourseUsers(courseId: number): Promise<IUser[]> {
+    private getCourseUsers(courseId: number): Promise<ICourseUser[]> {
         return new Promise((resolve, reject) => {
             db.query(
                 Queries.GetCourseUsers,
                 [courseId],
-                (error: Error, courseUsersData: IFullUserData[]) => {
+                (error: Error, courseUsersData: IFullCourseUserData[]) => {
                     if (error) {
                         reject(newBadRequestException(CoursesQueryList.GetCourseUsers));
                     }
 
                     resolve(
-                        courseUsersData.map((userData: IFullUserData) => getUserFromUserData(userData)),
+                        courseUsersData.map((userData: IFullCourseUserData) => getCourseUserFromUserData(userData)),
                     );
                 },
             );

@@ -1,8 +1,8 @@
 import { BadRequestException, NotFoundException } from '@nestjs/common';
 
-import { IFullUserData, IUser } from '../models/users.models';
+import { IFullUserData, IUser, IFullCourseUserData, ICourseUser } from '../models/users.models';
 import { IChatData, IChatWithImage } from '../models/chats.models';
-import { IFile } from '../models/common.models';
+import { IFile, IShortFile } from '../models/common.models';
 import { Image } from '../classes/image';
 
 export const getUserFromUserData = (userData: IFullUserData): IUser => {
@@ -29,6 +29,23 @@ export const getUserFromUserData = (userData: IFullUserData): IUser => {
   );
 
   return { ...otherUserData, avatar };
+};
+
+export const getCourseUserFromUserData = (userData: IFullCourseUserData): ICourseUser => {
+  const {
+    avatarId,
+    avatarName,
+    avatarMimeType,
+    ...otherData
+  } = userData;
+
+  const avatar: IShortFile = {
+    id: avatarId,
+    name: avatarName,
+    mimeType: avatarMimeType,
+  };
+
+  return { ...otherData, avatar };
 };
 
 export const getChatWithImageFromChatData = (chatData: IChatData): IChatWithImage => {

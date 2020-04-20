@@ -1,4 +1,4 @@
-import { IUser } from './users.models';
+import { IUser, ICourseUser } from './users.models';
 
 export interface ICourseCreationData {
     courseName: string;
@@ -63,5 +63,5 @@ export interface ICourseItem extends ICreateCourseItemData {
 
 export interface IFullCourseData extends ICourseData {
     courseItems: ICourseItem[];
-    users: IUser[];
+    courseUsers: ICourseUser[];
 }

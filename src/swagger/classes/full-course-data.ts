@@ -1,9 +1,9 @@
 import { ApiModelProperty } from '@nestjs/swagger';
 
 import { CourseModes, IFullCourseData, ICourseItem } from '../../models/courses.models';
-import { IUser } from '../../models/users.models';
+import { ICourseUser } from '../../models/users.models';
 import { CourseItemDto } from './course-item';
-import { UserDto } from './user';
+import { CourseUserDto } from './course-user';
 
 export class FullCourseDataDto implements IFullCourseData {
   @ApiModelProperty({ type: Number, required: true })
@@ -45,6 +45,6 @@ export class FullCourseDataDto implements IFullCourseData {
   @ApiModelProperty({ type: [CourseItemDto], required: true })
   public courseItems: ICourseItem[];
 
-  @ApiModelProperty({ type: [UserDto], required: true })
-  public users: IUser[];
+  @ApiModelProperty({ type: [CourseUserDto], required: true })
+  public courseUsers: ICourseUser[];
 }

@@ -17,3 +17,9 @@ export interface IFile {
     size: number;
     addedAt: string;
 }
+
+export interface IShortFile {
+    id: number;
+    name: string;
+    mimeType: string;
+}
