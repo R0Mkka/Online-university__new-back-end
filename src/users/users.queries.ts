@@ -5,6 +5,8 @@ export enum UsersQueryList {
     GetUserByLogin = 'GetUserByLogin',
     GetUserById = 'GetUserById',
     GetUserEntryIdByConnectionId = 'GetUserEntryIdByConnectionId',
+    GetUserIdByConnectionId = 'GetUserIdByConnectionId',
+    GetUsersLastEntries = 'GetUsersLastEntries',
     AddUserEntry = 'AddUserEntry',
     ModifyUserEntry = 'ModifyUserEntry',
     RegisterUser = 'RegisterUser',
@@ -72,6 +74,29 @@ export const Queries: { [key in UsersQueryList]: string } = {
             ${DBTables.UsersEntries}
         WHERE
             connectionId = ?;
+    `,
+
+    GetUserIdByConnectionId: `
+        SELECT
+            userId
+        FROM
+            ${DBTables.UsersEntries}
+        WHERE
+            connectionId = ?;
+    `,
+
+    GetUsersLastEntries: `
+        SELECT
+            *
+        FROM
+            ${DBTables.UsersEntries}
+        LEFT JOIN (
+            SELECT MAX(userEntryId) userEntryId
+            FROM ${DBTables.UsersEntries}
+            GROUP BY userId
+        ) maxEntriesIds
+        USING(userEntryId)
+        GROUP BY userId;
     `,
 
     AddUserEntry: `

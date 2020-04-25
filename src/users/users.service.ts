@@ -6,7 +6,7 @@ import * as path from 'path';
 import { Database } from '../database';
 import { UsersQueryList, Queries } from './users.queries';
 
-import { IUser, IFullUserData, IRegisterUserData, IUserEntryIdObject } from '../models/users.models';
+import { IUser, IFullUserData, IRegisterUserData, IUserIdObject, IUserEntryIdObject } from '../models/users.models';
 import { ISqlSuccessResponse } from '../models/common.models';
 import { NumberOrString } from '../models/database.models';
 import { getUserFromUserData, newBadRequestException, newNotFoundException } from '../helpers';
@@ -78,7 +78,7 @@ export class UsersService {
         });
     }
 
-    public getUserEntryIdByConnectionId(connectionId: string): Promise<any> {
+    public getUserEntryIdByConnectionId(connectionId: string): Promise<IUserEntryIdObject> {
         return new Promise((resolve, reject) => {
             db.query(
                 Queries.GetUserEntryIdByConnectionId,
@@ -91,6 +91,24 @@ export class UsersService {
                     }
 
                     resolve(userEntryIdObject);
+                },
+            );
+        });
+    }
+
+    public getUserIdByConnectionId(connectionId: string): Promise<IUserIdObject> {
+        return new Promise((resolve, reject) => {
+            db.query(
+                Queries.GetUserIdByConnectionId,
+                [connectionId],
+                (error: Error, userIdObjects: IUserIdObject[]) => {
+                    const userIdObject: IUserIdObject = userIdObjects[0];
+
+                    if (error || !userIdObject) {
+                        return reject(newNotFoundException(UsersQueryList.GetUserIdByConnectionId));
+                    }
+
+                    resolve(userIdObject);
                 },
             );
         });
@@ -125,7 +143,8 @@ export class UsersService {
                     resolve(modifyData);
                 },
             );
-        });
+        })
+        .then(() => this.getUserIdByConnectionId(connectionId));
     }
 
     public async registerUser(registerUserData: IRegisterUserData): Promise<ISqlSuccessResponse> {

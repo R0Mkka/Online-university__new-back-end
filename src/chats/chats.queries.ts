@@ -4,6 +4,7 @@ export enum ChatQueryList {
     GetUserChatList = 'GetUserChatList',
     CreateChat = 'CreateChat',
     CreateUserChatConnection = 'CreateUserChatConnection',
+    DeleteUserChatConnection = 'DeleteUserChatConnection',
     GetFullChatData = 'GetFullChatData',
     GetChatUsers = 'GetChatUsers',
     GetChatMessages = 'GetChatMessages',
@@ -32,18 +33,29 @@ export const Queries: { [key in ChatQueryList]: string } = {
             USING (chatImageId)
         WHERE userId = ?
     `,
+
     CreateChat: `
         INSERT INTO ${DBTables.Chats} (
             chatOwnerId,
             chatName
         ) VALUES (?,?);
     `,
+
     CreateUserChatConnection: `
         INSERT INTO ${DBTables.UsersChats} (
             userId,
             chatId
         ) VALUES (?,?);
     `,
+
+    DeleteUserChatConnection: `
+        DELETE
+        FROM
+            ${DBTables.UsersChats}
+        WHERE
+            userId = ? AND chatId = ?;
+    `,
+
     GetFullChatData: `
         SELECT
             ${DBTables.Chats}.chatId,
@@ -63,6 +75,7 @@ export const Queries: { [key in ChatQueryList]: string } = {
             USING(chatImageId)
         WHERE chatId = ?;
     `,
+
     GetChatUsers: `
         SELECT
             ${DBTables.Users}.userId,
@@ -103,6 +116,7 @@ export const Queries: { [key in ChatQueryList]: string } = {
             USING(languageId)
         WHERE chatId = ?;
     `,
+
     GetChatMessages: `
         SELECT
             ${DBTables.Messages}.messageId,
@@ -121,6 +135,7 @@ export const Queries: { [key in ChatQueryList]: string } = {
             USING(userId)
         WHERE chatId = ?;
     `,
+
     AddMessage: `
         INSERT INTO ${DBTables.Messages} (
             chatId,

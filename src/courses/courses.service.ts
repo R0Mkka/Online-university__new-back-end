@@ -18,8 +18,8 @@ const db = Database.getInstance();
 @Injectable()
 export class CoursesService {
     constructor(
-        private readonly chatsService: ChatsService,
-        private readonly courseItemsService: CourseItemsService,
+        private chatsService: ChatsService,
+        private courseItemsService: CourseItemsService,
     ) {}
 
     public getUserCourseList(userId: number): Promise<ICourseData[]> {
@@ -150,15 +150,19 @@ export class CoursesService {
         };
     }
 
-    public async destroyConnection(courseId: number, userPayload: IUserLikePayload): Promise<ISqlSuccessResponse> {
+    public async destroyConnection(courseId: number, userId: number): Promise<ISqlSuccessResponse> {
         return new Promise((resolve, reject) => {
             db.query(
                 Queries.DestroyUserCourseConnection,
-                [userPayload.userId, courseId],
-                (error: Error, destroyingInfo: ISqlSuccessResponse) => {
+                [userId, courseId],
+                async (error: Error, destroyingInfo: ISqlSuccessResponse) => {
                     if (error) {
                         reject(newBadRequestException(CoursesQueryList.DestroyUserCourseConnection));
                     }
+
+                    const course = await this.getCourseById(courseId);
+
+                    await this.chatsService.destroyConnection(course.chatId, userId);
 
                     resolve(destroyingInfo);
                 },

@@ -105,8 +105,10 @@ export const Queries: { [key in CoursesQueryList]: string } = {
 
     DestroyUserCourseConnection: `
         DELETE
-        FROM ${DBTables.UsersCourses}
-        WHERE userId = ? AND courseId = ?;
+        FROM
+            ${DBTables.UsersCourses}
+        WHERE
+            userId = ? AND courseId = ?;
     `,
 
     GetCourseByCode: `

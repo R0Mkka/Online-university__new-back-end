@@ -71,6 +71,22 @@ export class ChatsService {
         });
     }
 
+    public destroyConnection(chatId: number, userId: number): Promise<ISqlSuccessResponse> {
+        return new Promise((resolve, reject) => {
+            db.query(
+                Queries.DeleteUserChatConnection,
+                [userId, chatId],
+                (error: Error, destroyingInfo: ISqlSuccessResponse) => {
+                    if (error) {
+                        return reject(newBadRequestException(ChatQueryList.DeleteUserChatConnection));
+                    }
+
+                    resolve(destroyingInfo);
+                },
+            );
+        });
+    }
+
     public getFullChatData(chatId: number): Promise<IFullChatData> {
         return new Promise((resolve, reject) => {
             db.query(

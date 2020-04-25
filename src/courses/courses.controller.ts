@@ -1,4 +1,4 @@
-import { Controller, UseGuards, Get, Request, Post, Delete, Param, Body, BadRequestException } from '@nestjs/common';
+import { Controller, UseGuards, Get, Request, Post, Delete, Param, Body, BadRequestException, Query } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import {
     ApiBearerAuth,
@@ -109,6 +109,18 @@ export class CoursesController {
     ): Promise<ISqlSuccessResponse> {
         const courseId: number = tryNumberParse(courseIdAsString);
 
-        return this.coursesService.destroyConnection(courseId, req.user);
+        return this.coursesService.destroyConnection(courseId, req.user.userId);
+    }
+
+    // Swagger
+    @Delete('/delete-student/:courseId')
+    public deleteStudentFromCourse(
+        @Param('courseId') courseIdAsString: string,
+        @Query('studentId') studentIdAsString: string,
+    ): Promise<ISqlSuccessResponse> {
+        const courseId: number = tryNumberParse(courseIdAsString);
+        const studentId: number = tryNumberParse(studentIdAsString);
+
+        return this.coursesService.destroyConnection(courseId, studentId);
     }
 }
