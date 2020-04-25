@@ -15,6 +15,11 @@ export enum DBTables {
     UsersChats = 'users_chats',
     Messages = 'messages',
     MessagesStatuses = 'messages_statuses',
+    DaysOfTheWeek = 'days_of_the_week',
+    TimetableItems = 'timetable_items',
+    TimetableItemGroups = 'timetable_item_groups',
+    TimetableItemStickers = 'timetable_item_stickers',
+    TimetableItemsTimetableItemsStickers = 'timetable_items_timetable_items_stickers',
 }
 
 export enum SwaggerTags {
@@ -25,4 +30,5 @@ export enum SwaggerTags {
     CourseItems = 'CourseItems',
     Chats = 'Chats',
     Files = 'Files',
+    Timetable = 'Timetable',
 }
