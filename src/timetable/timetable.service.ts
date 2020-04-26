@@ -9,6 +9,11 @@ import {
     ITimetableItemGroup,
     ITimetableItemSticker,
     INewTimetableItem,
+    ICreatedTimetableItemInfo,
+    INewTimetableItemsGroup,
+    ICreatedTimetableItemsGroupInfo,
+    INewTimetableItemsSticker,
+    ICreatedTimetableItemsStickerInfo,
 } from '../models/timetable.models';
 import { ISqlSuccessResponse } from '../models/common.models';
 import { newBadRequestException } from '../helpers';
@@ -79,7 +84,7 @@ export class TimetableService {
         });
     }
 
-    public createTimetableItem(userId: number, newTimetableItem: INewTimetableItem): Promise<ISqlSuccessResponse> {
+    public createTimetableItem(userId: number, newTimetableItem: INewTimetableItem): Promise<ICreatedTimetableItemInfo> {
         return new Promise((resolve, reject) => {
             db.query(
                 TimetableQueries.CreateTimetableitem,
@@ -95,12 +100,63 @@ export class TimetableService {
                     newTimetableItem.startTime,
                     newTimetableItem.endTime,
                 ],
-                (error: Error, timetableItemCreationInfo: ISqlSuccessResponse) => {
+                (error: Error, creationInfo: ISqlSuccessResponse) => {
                     if (error) {
                         return reject(newBadRequestException(TimetableQueryList.CreateTimetableitem));
                     }
 
-                    resolve(timetableItemCreationInfo);
+                    resolve({
+                        newTimetableItemId: creationInfo.insertId,
+                    });
+                },
+            );
+        });
+    }
+
+    public createTimetableItemsGroup(
+        userId: number,
+        newTimetableItemsGroupData: INewTimetableItemsGroup,
+    ): Promise<ICreatedTimetableItemsGroupInfo> {
+        return new Promise((resolve, reject) => {
+            db.query(
+                TimetableQueries.CreateTimetableitemsGroup,
+                [
+                    userId,
+                    newTimetableItemsGroupData.name,
+                ],
+                (error: Error, creationInfo: ISqlSuccessResponse) => {
+                    if (error) {
+                        return reject(newBadRequestException(TimetableQueryList.CreateTimetableitemsGroup));
+                    }
+
+                    resolve({
+                        newTimetableItemsGroupId: creationInfo.insertId,
+                    });
+                },
+            );
+        });
+    }
+
+    public createTimetableItemsSticker(
+        userId: number,
+        newTimetableItemsStickerData: INewTimetableItemsSticker,
+    ): Promise<ICreatedTimetableItemsStickerInfo> {
+        return new Promise((resolve, reject) => {
+            db.query(
+                TimetableQueries.CreateTimetableitemsSticker,
+                [
+                    userId,
+                    newTimetableItemsStickerData.title,
+                    newTimetableItemsStickerData.color,
+                ],
+                (error: Error, creationInfo: ISqlSuccessResponse) => {
+                    if (error) {
+                        return reject(newBadRequestException(TimetableQueryList.CreateTimetableitemsSticker));
+                    }
+
+                    resolve({
+                        newTimetableItemStickerId: creationInfo.insertId,
+                    });
                 },
             );
         });

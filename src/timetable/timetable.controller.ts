@@ -11,8 +11,12 @@ import {
     ITimetableItemGroup,
     ITimetableItemSticker,
     INewTimetableItem,
+    ICreatedTimetableItemInfo,
+    INewTimetableItemsGroup,
+    ICreatedTimetableItemsGroupInfo,
+    INewTimetableItemsSticker,
+    ICreatedTimetableItemsStickerInfo,
 } from '../models/timetable.models';
-import { ISqlSuccessResponse } from '../models/common.models';
 import { SwaggerTags } from '../constants';
 
 // Swagger
@@ -49,7 +53,23 @@ export class TimetableController {
     public createUserTimetableItem(
         @Body() newTimetableItemData: INewTimetableItem,
         @Request() req: IAuthReq,
-    ): Promise<ISqlSuccessResponse> {
+    ): Promise<ICreatedTimetableItemInfo> {
         return this.timetableService.createTimetableItem(req.user.userId, newTimetableItemData);
+    }
+
+    @Post('items-groups')
+    public createUserTimetableItemsGroup(
+        @Body() newTimetableItemsGroupData: INewTimetableItemsGroup,
+        @Request() req: IAuthReq,
+    ): Promise<ICreatedTimetableItemsGroupInfo> {
+        return this.timetableService.createTimetableItemsGroup(req.user.userId, newTimetableItemsGroupData);
+    }
+
+    @Post('items-stickers')
+    public createUserTimetableItemsSticker(
+        @Body() newTimetableItemsStickerData: INewTimetableItemsSticker,
+        @Request() req: IAuthReq,
+    ): Promise<ICreatedTimetableItemsStickerInfo> {
+        return this.timetableService.createTimetableItemsSticker(req.user.userId, newTimetableItemsStickerData);
     }
 }

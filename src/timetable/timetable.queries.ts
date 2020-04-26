@@ -5,6 +5,8 @@ export enum TimetableQueryList {
     GetUserTimetableItemsGroups = 'GetUserTimetableItemsGroups',
     GetUserTimetableItemsStickers = 'GetUserTimetableItemsStickers',
     CreateTimetableitem = 'CreateTimetableitem',
+    CreateTimetableitemsGroup = 'CreateTimetableitemsGroup',
+    CreateTimetableitemsSticker = 'CreateTimetableitemsSticker',
 }
 
 export const TimetableQueries: { [key in TimetableQueryList]: string } = {
@@ -49,5 +51,22 @@ export const TimetableQueries: { [key in TimetableQueryList]: string } = {
             endTime
         )
         VALUES (?,?,?,?,?,?,?,?,?,?);
+    `,
+
+    CreateTimetableitemsGroup: `
+        INSERT INTO ${DBTables.TimetableItemGroups} (
+            userId,
+            name
+        )
+        VALUES (?,?);
+    `,
+
+    CreateTimetableitemsSticker: `
+        INSERT INTO ${DBTables.TimetableItemStickers} (
+            userId,
+            title,
+            color
+        )
+        VALUES (?,?,?);
     `,
 };

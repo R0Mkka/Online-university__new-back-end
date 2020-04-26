@@ -48,6 +48,27 @@ export interface INewTimetableItem {
     endTime: string;
 }
 
+export interface ICreatedTimetableItemInfo {
+    newTimetableItemId: number;
+}
+
+export interface INewTimetableItemsGroup {
+    name: string;
+}
+
+export interface ICreatedTimetableItemsGroupInfo {
+    newTimetableItemsGroupId: number;
+}
+
+export interface INewTimetableItemsSticker {
+    title: string;
+    color: string;
+}
+
+export interface ICreatedTimetableItemsStickerInfo {
+    newTimetableItemStickerId: number;
+}
+
 export enum DaysOfTheWeek {
     Monday = 1,
     Tuesday = 2,
