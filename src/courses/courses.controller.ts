@@ -1,4 +1,4 @@
-import { Controller, UseGuards, Get, Request, Post, Delete, Param, Body, BadRequestException, Query } from '@nestjs/common';
+import { Controller, UseGuards, Get, Request, Post, Delete, Param, Body, Query } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import {
     ApiBearerAuth,
@@ -17,7 +17,7 @@ import { CoursesService } from './courses.service';
 import { NoStudentsGuard } from '../guards/no-students.guard';
 
 import { IAuthReq } from '../models/auth.models';
-import { ICourseCreationData, IJoinCourseData, ICourseData, IFullCourseData, IJoinedCourseData } from '../models/courses.models';
+import { ICourseCreationData, IJoinCourseData, ICourseData, IFullCourseData, IJoinedCourseData, IUserDeletedFromCourse, ICreatedCourseData } from '../models/courses.models';
 import { ISqlSuccessResponse } from '../models/common.models';
 import { SwaggerTags } from '../constants';
 import { tryNumberParse } from '../helpers';
@@ -70,7 +70,7 @@ export class CoursesController {
     public createCourse(
         @Body() courseCreationInfo: ICourseCreationData,
         @Request() req: IAuthReq,
-    ): Promise<ISqlSuccessResponse> {
+    ): Promise<ICreatedCourseData> {
         return this.coursesService.createCourse(courseCreationInfo, req.user);
     }
 
@@ -106,7 +106,7 @@ export class CoursesController {
     public leaveCourse(
         @Param('courseId') courseIdAsString: string,
         @Request() req: IAuthReq,
-    ): Promise<ISqlSuccessResponse> {
+    ): Promise<IUserDeletedFromCourse> {
         const courseId: number = tryNumberParse(courseIdAsString);
 
         return this.coursesService.destroyConnection(courseId, req.user.userId);
@@ -117,7 +117,7 @@ export class CoursesController {
     public deleteStudentFromCourse(
         @Param('courseId') courseIdAsString: string,
         @Query('studentId') studentIdAsString: string,
-    ): Promise<ISqlSuccessResponse> {
+    ): Promise<IUserDeletedFromCourse> {
         const courseId: number = tryNumberParse(courseIdAsString);
         const studentId: number = tryNumberParse(studentIdAsString);
 

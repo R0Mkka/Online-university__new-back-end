@@ -6,7 +6,16 @@ import { CourseItemsService } from '../course-items/course-items.service';
 import { Database } from './../database';
 import { CoursesQueryList, Queries } from './courses.queries';
 
-import { ICourseCreationData, ICourseData, IFullCourseData, ICourseItemData, ICourseItem, IJoinedCourseData } from '../models/courses.models';
+import {
+    ICourseCreationData,
+    ICourseData,
+    IFullCourseData,
+    ICourseItemData,
+    ICourseItem,
+    IJoinedCourseData,
+    IUserDeletedFromCourse,
+    ICreatedCourseData,
+} from '../models/courses.models';
 import { ISqlSuccessResponse } from '../models/common.models';
 import { IUserLikePayload } from '../models/auth.models';
 import { Roles, IFullCourseUserData, ICourseUser } from '../models/users.models';
@@ -56,7 +65,7 @@ export class CoursesService {
 
     public async getFullCourseData(courseId: number): Promise<IFullCourseData> {
         const courseWithoutContent: ICourseData = await this.getCourseById(courseId);
-        const courseItems: ICourseItem[] = await this.getCourseContent(courseId);
+        const courseItems: ICourseItem[] = await this.getCourseItems(courseId);
         const courseUsers: ICourseUser[] = await this.getCourseUsers(courseId);
 
         return {
@@ -66,7 +75,7 @@ export class CoursesService {
         };
     }
 
-    public async createCourse(courseDto: ICourseCreationData, userPayload: IUserLikePayload): Promise<ISqlSuccessResponse> {
+    public async createCourse(courseDto: ICourseCreationData, userPayload: IUserLikePayload): Promise<ICreatedCourseData> {
         const chatName: string = `Чат курса '${courseDto.courseName}'`;
 
         try {
@@ -107,8 +116,12 @@ export class CoursesService {
                 );
             });
         })
-        .then((courseCreationInfo: ISqlSuccessResponse) => {
-            return this.createUserCourseConnection(courseCreationInfo.insertId, userPayload);
+        .then(async (courseCreationInfo: ISqlSuccessResponse) => {
+            await this.createUserCourseConnection(courseCreationInfo.insertId, userPayload);
+
+            return {
+                createdCourseId: courseCreationInfo.insertId,
+            };
         });
     }
 
@@ -150,12 +163,12 @@ export class CoursesService {
         };
     }
 
-    public async destroyConnection(courseId: number, userId: number): Promise<ISqlSuccessResponse> {
+    public async destroyConnection(courseId: number, userId: number): Promise<IUserDeletedFromCourse> {
         return new Promise((resolve, reject) => {
             db.query(
                 Queries.DestroyUserCourseConnection,
                 [userId, courseId],
-                async (error: Error, destroyingInfo: ISqlSuccessResponse) => {
+                async (error: Error, _: ISqlSuccessResponse) => {
                     if (error) {
                         reject(newBadRequestException(CoursesQueryList.DestroyUserCourseConnection));
                     }
@@ -164,7 +177,10 @@ export class CoursesService {
 
                     await this.chatsService.destroyConnection(course.chatId, userId);
 
-                    resolve(destroyingInfo);
+                    resolve({
+                        courseId,
+                        deletedUserId: userId,
+                    });
                 },
             );
         });
@@ -194,13 +210,15 @@ export class CoursesService {
     ): NumberOrString[] {
         const params: NumberOrString[] = [];
 
-        params.push(generatedCourseDataInfo.insertId);
-        params.push(userPayload.userId);
-        params.push(chatCreationInfo.insertId);
-        params.push(courseDto.courseName);
-        params.push(courseDto.courseGroupName);
-        params.push(courseDto.courseDescription);
-        params.push(courseDto.courseCode);
+        params.push(
+            generatedCourseDataInfo.insertId,
+            userPayload.userId,
+            chatCreationInfo.insertId,
+            courseDto.courseName,
+            courseDto.courseGroupName,
+            courseDto.courseDescription,
+            courseDto.courseCode,
+        );
 
         return params;
     }
@@ -261,14 +279,14 @@ export class CoursesService {
         });
     }
 
-    private getCourseContent(courseId: number): Promise<ICourseItem[]> {
+    private getCourseItems(courseId: number): Promise<ICourseItem[]> {
         return new Promise((resolve, reject) => {
             db.query(
-                Queries.GetCourseContent,
+                Queries.GetCourseItems,
                 [courseId],
                 (error: Error, courseItemsData: ICourseItemData[]) => {
                     if (error) {
-                        reject(newBadRequestException(CoursesQueryList.GetCourseContent));
+                        reject(newBadRequestException(CoursesQueryList.GetCourseItems));
                     }
 
                     const courseItems: ICourseItem[] = [];

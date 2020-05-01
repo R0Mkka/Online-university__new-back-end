@@ -1,21 +1,23 @@
 import { DBTables } from '../constants';
 
 export enum CourseItemsQueryList {
-  AddCourseItem = 'AddCourseItem',
+  CreateCourseItem = 'CreateCourseItem',
   RemoveCourseItem = 'RemoveCourseItem',
   ModifyCourseItem = 'ModifyCourseItem',
   GetCourseItemById = 'GetCourseItemById',
 }
 
 export const CourseItemsQueires: { [key in CourseItemsQueryList]: string } = {
-  AddCourseItem: `
+  CreateCourseItem: `
     INSERT INTO ${DBTables.CoursesItems} (
       courseId,
+      courseItemTypeId,
       creatorId,
       courseItemTitle,
       courseItemtextContent
-    ) VALUES (?,?,?,?);
+    ) VALUES (?,?,?,?,?);
   `,
+
   RemoveCourseItem: `
     DELETE
     FROM
@@ -23,6 +25,7 @@ export const CourseItemsQueires: { [key in CourseItemsQueryList]: string } = {
     WHERE
       courseItemId = ?;
   `,
+
   ModifyCourseItem: `
     UPDATE
       ${DBTables.CoursesItems}
@@ -32,6 +35,7 @@ export const CourseItemsQueires: { [key in CourseItemsQueryList]: string } = {
     WHERE
       courseItemId = ?;
   `,
+
   GetCourseItemById: `
     SELECT
       *

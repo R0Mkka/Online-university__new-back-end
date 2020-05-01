@@ -6,6 +6,9 @@ export class CreateCourseItemDto implements ICreateCourseItemData {
   @ApiModelProperty({ type: Number, required: true })
   public courseId: number;
 
+  @ApiModelProperty({ type: Number, required: true })
+  public courseItemTypeId: number;
+
   @ApiModelProperty({ type: String, required: true })
   public courseItemTitle: string;
 

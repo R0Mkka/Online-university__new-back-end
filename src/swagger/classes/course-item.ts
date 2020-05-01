@@ -9,6 +9,9 @@ export class CourseItemDto implements ICourseItem {
   public courseItemId: number;
 
   @ApiModelProperty({ type: Number, required: true })
+  public courseItemTypeId: number;
+
+  @ApiModelProperty({ type: Number, required: true })
   public courseId: number;
 
   @ApiModelProperty({ type: UserDto, required: true })

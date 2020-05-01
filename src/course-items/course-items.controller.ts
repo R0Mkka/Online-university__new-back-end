@@ -14,7 +14,7 @@ import {
 import { CourseItemsService } from './course-items.service';
 import { NoStudentsGuard } from '../guards/no-students.guard';
 
-import { ICreateCourseItemData, IModifyCourseItemData } from '../models/courses.models';
+import { ICreateCourseItemData, IModifyCourseItemData, ICreatedCourseItemData } from '../models/courses.models';
 import { IAuthReq } from '../models/auth.models';
 import { ISqlSuccessResponse } from '../models/common.models';
 import { SwaggerTags } from '../constants';
@@ -42,11 +42,11 @@ export class CourseItemsController {
   @Post()
   @ApiImplicitBody(createCourseItemOptions)
   @ApiForbiddenResponse({ description: 'Only Teachers and Admins have the opportunity to create courses items' })
-  public addCourseItem(
+  public createCourseItem(
     @Body() createCourseItemData: ICreateCourseItemData,
     @Request() req: IAuthReq,
-  ): Promise<ISqlSuccessResponse> {
-    return this.courseItemsService.addCourseItem(createCourseItemData, req.user);
+  ): Promise<ICreatedCourseItemData> {
+    return this.courseItemsService.createCourseItem(createCourseItemData, req.user);
   }
 
   @Delete(':courseItemId')

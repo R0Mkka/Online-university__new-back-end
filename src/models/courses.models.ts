@@ -37,6 +37,7 @@ export interface ICourseData {
 
 export interface ICourseItemData {
     courseItemId: number;
+    courseItemTypeId: number;
     courseId: number;
     creatorId: number;
     courseItemTitle: string;
@@ -46,6 +47,7 @@ export interface ICourseItemData {
 
 export interface ICreateCourseItemData {
     courseId: number;
+    courseItemTypeId: number;
     courseItemTitle: string;
     courseItemTextContent: string;
 }
@@ -64,4 +66,17 @@ export interface ICourseItem extends ICreateCourseItemData {
 export interface IFullCourseData extends ICourseData {
     courseItems: ICourseItem[];
     courseUsers: ICourseUser[];
+}
+
+export interface ICreatedCourseData {
+    createdCourseId: number;
+}
+
+export interface ICreatedCourseItemData {
+    createdCourseItemId: number;
+}
+
+export interface IUserDeletedFromCourse {
+    courseId: number;
+    deletedUserId: number;
 }

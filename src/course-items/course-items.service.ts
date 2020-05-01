@@ -5,7 +5,7 @@ import { UsersService } from '../users/users.service';
 import { Database } from '../database';
 import { CourseItemsQueryList, CourseItemsQueires } from './course-items.queries';
 
-import { ICreateCourseItemData, IModifyCourseItemData, ICourseItem, ICourseItemData } from '../models/courses.models';
+import { ICreateCourseItemData, IModifyCourseItemData, ICourseItem, ICourseItemData, ICreatedCourseItemData } from '../models/courses.models';
 import { IUserLikePayload } from '../models/auth.models';
 import { ISqlSuccessResponse } from '../models/common.models';
 import { NumberOrString } from '../models/database.models';
@@ -20,22 +20,24 @@ export class CourseItemsService {
     private readonly usersService: UsersService,
   ) {}
 
-  public addCourseItem(
+  public createCourseItem(
     createCourseItemData: ICreateCourseItemData,
     userPayload: IUserLikePayload,
-  ): Promise<ISqlSuccessResponse> {
+  ): Promise<ICreatedCourseItemData> {
     return new Promise((resolve, reject) => {
       const params: NumberOrString[] = this.getCourseItemCreationParams(createCourseItemData, userPayload);
 
       db.query(
-        CourseItemsQueires.AddCourseItem,
+        CourseItemsQueires.CreateCourseItem,
         params,
         (error: Error, courseItemCreationInfo: ISqlSuccessResponse) => {
           if (error) {
-            return reject(newBadRequestException(CourseItemsQueryList.AddCourseItem));
+            return reject(newBadRequestException(CourseItemsQueryList.CreateCourseItem));
           }
 
-          resolve(courseItemCreationInfo);
+          resolve({
+            createdCourseItemId: courseItemCreationInfo.insertId,
+          });
         },
       );
     });
@@ -91,6 +93,7 @@ export class CourseItemsService {
     const params: NumberOrString[] = [];
 
     params.push(createCourseItemData.courseId);
+    params.push(createCourseItemData.courseItemTypeId);
     params.push(userPayload.userId);
     params.push(createCourseItemData.courseItemTitle);
     params.push(createCourseItemData.courseItemTextContent);

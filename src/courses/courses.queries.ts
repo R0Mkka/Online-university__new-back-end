@@ -10,7 +10,7 @@ export enum CoursesQueryList {
     DestroyUserCourseConnection = 'DestroyUserCourseConnection',
     GetCourseByCode = 'GetCourseByCode',
     GetCourseById = 'GetCourseById',
-    GetCourseContent = 'GetCourseContent',
+    GetCourseItems = 'GetCourseItems',
     GetCourseUsers = 'GetCourseUsers',
 }
 
@@ -165,14 +165,15 @@ export const Queries: { [key in CoursesQueryList]: string } = {
         WHERE ${DBTables.Courses}.courseId = ?;
     `,
 
-    GetCourseContent: `
+    GetCourseItems: `
         SELECT
             *
         FROM
-            courses_items
+            ${DBTables.CoursesItems}
         WHERE
             courseId = ?;
     `,
+    
     // TODO: Think about which fields really need here, temporary remove
     // ${DBTables.Users}.login,
     // ${DBTables.Users}.educationalInstitution,
