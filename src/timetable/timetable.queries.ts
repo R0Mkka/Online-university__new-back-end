@@ -4,9 +4,10 @@ export enum TimetableQueryList {
     GetUserTimetableItems = 'GetUserTimetableItems',
     GetUserTimetableItemsGroups = 'GetUserTimetableItemsGroups',
     GetUserTimetableItemsStickers = 'GetUserTimetableItemsStickers',
-    CreateTimetableitem = 'CreateTimetableitem',
-    CreateTimetableitemsGroup = 'CreateTimetableitemsGroup',
-    CreateTimetableitemsSticker = 'CreateTimetableitemsSticker',
+    CreateTimetableItem = 'CreateTimetableItem',
+    CreateTimetableItemsGroup = 'CreateTimetableItemsGroup',
+    CreateTimetableItemsSticker = 'CreateTimetableItemsSticker',
+    DeleteTimetableItemsGroup = 'DeleteTimetableItemsGroup',
 }
 
 export const TimetableQueries: { [key in TimetableQueryList]: string } = {
@@ -37,7 +38,7 @@ export const TimetableQueries: { [key in TimetableQueryList]: string } = {
             userId = ?;
     `,
 
-    CreateTimetableitem: `
+    CreateTimetableItem: `
         INSERT INTO ${DBTables.TimetableItems} (
             userId,
             dayOfTheWeekId,
@@ -53,7 +54,7 @@ export const TimetableQueries: { [key in TimetableQueryList]: string } = {
         VALUES (?,?,?,?,?,?,?,?,?,?);
     `,
 
-    CreateTimetableitemsGroup: `
+    CreateTimetableItemsGroup: `
         INSERT INTO ${DBTables.TimetableItemGroups} (
             userId,
             name
@@ -61,12 +62,20 @@ export const TimetableQueries: { [key in TimetableQueryList]: string } = {
         VALUES (?,?);
     `,
 
-    CreateTimetableitemsSticker: `
+    CreateTimetableItemsSticker: `
         INSERT INTO ${DBTables.TimetableItemStickers} (
             userId,
             title,
             color
         )
         VALUES (?,?,?);
+    `,
+
+    DeleteTimetableItemsGroup: `
+        DELETE
+        FROM
+            ${DBTables.TimetableItemGroups}
+        WHERE
+            userId = ? AND timetableItemGroupId = ?;
     `,
 };

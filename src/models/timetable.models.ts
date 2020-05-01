@@ -60,6 +60,10 @@ export interface ICreatedTimetableItemsGroupInfo {
     newTimetableItemsGroupId: number;
 }
 
+export interface IDeletedTimetableItemsGroupInfo {
+    deletedTimetableItemsGroupId: number;
+}
+
 export interface INewTimetableItemsSticker {
     title: string;
     color: string;

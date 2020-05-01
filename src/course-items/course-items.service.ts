@@ -79,7 +79,7 @@ export class CourseItemsService {
   public async getCourseItemFromCourseItemData(courseItemData: ICourseItemData): Promise<ICourseItem> {
     const { creatorId, ...otherCourseItemData } = courseItemData;
 
-    const user: IUser = await this.usersService.getUserById(creatorId);
+    const user: IUser = await this.usersService.getUserById(creatorId) as IUser;
 
     return { ...otherCourseItemData, creator: user };
   }

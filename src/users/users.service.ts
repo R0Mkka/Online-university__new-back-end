@@ -10,6 +10,7 @@ import { IUser, IFullUserData, IRegisterUserData, IUserIdObject, IUserEntryIdObj
 import { ISqlSuccessResponse } from '../models/common.models';
 import { NumberOrString } from '../models/database.models';
 import { getUserFromUserData, newBadRequestException, newNotFoundException } from '../helpers';
+import { IChangePasswordData } from 'src/models/user-settings.models';
 
 const db = Database.getInstance();
 
@@ -56,7 +57,7 @@ export class UsersService {
         });
     }
 
-    public getUserById(userId: number): Promise<IUser> {
+    public getUserById(userId: number, withPassword: boolean = false): Promise<IUser | IFullUserData> {
         return new Promise((resolve, reject) => {
             db.query(
                 Queries.GetUserById,
@@ -70,9 +71,11 @@ export class UsersService {
                         return reject(newNotFoundException(UsersQueryList.GetUserById));
                     }
 
-                    const user: IUser = getUserFromUserData(usersData[0]);
-
-                    resolve(user);
+                    if (withPassword) {
+                        resolve(usersData[0]);
+                    } else {
+                        resolve(getUserFromUserData(usersData[0]));
+                    }
                 },
             );
         });
@@ -165,8 +168,8 @@ export class UsersService {
         });
     }
 
-    public async modifyUser(modifyUserData: any, userId: number): Promise<ISqlSuccessResponse> {
-        const user: IUser = await this.getUserById(userId);
+    public async modifyUser(modifyUserData: any, userId: number): Promise<ISqlSuccessResponse> { // TODO: Type
+        const user: IUser = await this.getUserById(userId) as IUser;
         const params: NumberOrString[] = this.getUserModifyParams({ ...user, ...modifyUserData });
 
         return new Promise((resolve, reject) => {
@@ -183,8 +186,34 @@ export class UsersService {
         });
     }
 
+    public async changeUserPassword(changePasswordData: IChangePasswordData, userId: number): Promise<ISqlSuccessResponse> {
+        const userWithPassword = true;
+        const fullUserData: IFullUserData = await this.getUserById(userId, userWithPassword) as IFullUserData;
+        const doPasswordsMatch = await bcrypt.compare(changePasswordData.oldPassword, fullUserData.password);
+
+        if (!doPasswordsMatch) {
+            return Promise.reject(newBadRequestException('INVALID PASSWORD'));
+        }
+
+        return new Promise(async (resolve, reject) => {
+            const hashedPassword = await bcrypt.hash(changePasswordData.newPassword, 10);
+
+            db.query(
+                Queries.ChangeUserPassword,
+                [hashedPassword, userId],
+                (error: Error, changingInfo: ISqlSuccessResponse) => {
+                    if (error) {
+                        return reject(newBadRequestException(UsersQueryList.ChangeUserPassword));
+                    }
+
+                    resolve(changingInfo);
+                },
+            );
+        });
+    }
+
     public async deleteUser(userId: number): Promise<ISqlSuccessResponse> {
-        const user: IUser = await this.getUserById(userId);
+        const user: IUser = await this.getUserById(userId) as IUser;
 
         if (!!user.avatar.id) {
             const filePath: string = path.join(__dirname, '../', '../', 'files', user.avatar.name);

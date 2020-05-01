@@ -14,6 +14,7 @@ import {
     ICreatedTimetableItemsGroupInfo,
     INewTimetableItemsSticker,
     ICreatedTimetableItemsStickerInfo,
+    IDeletedTimetableItemsGroupInfo,
 } from '../models/timetable.models';
 import { ISqlSuccessResponse } from '../models/common.models';
 import { newBadRequestException } from '../helpers';
@@ -87,7 +88,7 @@ export class TimetableService {
     public createTimetableItem(userId: number, newTimetableItem: INewTimetableItem): Promise<ICreatedTimetableItemInfo> {
         return new Promise((resolve, reject) => {
             db.query(
-                TimetableQueries.CreateTimetableitem,
+                TimetableQueries.CreateTimetableItem,
                 [
                     userId,
                     newTimetableItem.dayOfTheWeekId,
@@ -102,7 +103,7 @@ export class TimetableService {
                 ],
                 (error: Error, creationInfo: ISqlSuccessResponse) => {
                     if (error) {
-                        return reject(newBadRequestException(TimetableQueryList.CreateTimetableitem));
+                        return reject(newBadRequestException(TimetableQueryList.CreateTimetableItem));
                     }
 
                     resolve({
@@ -119,14 +120,14 @@ export class TimetableService {
     ): Promise<ICreatedTimetableItemsGroupInfo> {
         return new Promise((resolve, reject) => {
             db.query(
-                TimetableQueries.CreateTimetableitemsGroup,
+                TimetableQueries.CreateTimetableItemsGroup,
                 [
                     userId,
                     newTimetableItemsGroupData.name,
                 ],
                 (error: Error, creationInfo: ISqlSuccessResponse) => {
                     if (error) {
-                        return reject(newBadRequestException(TimetableQueryList.CreateTimetableitemsGroup));
+                        return reject(newBadRequestException(TimetableQueryList.CreateTimetableItemsGroup));
                     }
 
                     resolve({
@@ -143,7 +144,7 @@ export class TimetableService {
     ): Promise<ICreatedTimetableItemsStickerInfo> {
         return new Promise((resolve, reject) => {
             db.query(
-                TimetableQueries.CreateTimetableitemsSticker,
+                TimetableQueries.CreateTimetableItemsSticker,
                 [
                     userId,
                     newTimetableItemsStickerData.title,
@@ -151,11 +152,29 @@ export class TimetableService {
                 ],
                 (error: Error, creationInfo: ISqlSuccessResponse) => {
                     if (error) {
-                        return reject(newBadRequestException(TimetableQueryList.CreateTimetableitemsSticker));
+                        return reject(newBadRequestException(TimetableQueryList.CreateTimetableItemsSticker));
                     }
 
                     resolve({
                         newTimetableItemStickerId: creationInfo.insertId,
+                    });
+                },
+            );
+        });
+    }
+
+    public deleteTimetableItemsGroup(userId: number, groupId: number): Promise<IDeletedTimetableItemsGroupInfo> {
+        return new Promise((resolve, reject) => {
+            db.query(
+                TimetableQueries.DeleteTimetableItemsGroup,
+                [userId, groupId],
+                (error: Error, _: ISqlSuccessResponse) => {
+                    if (error) {
+                        return reject(newBadRequestException(TimetableQueryList.DeleteTimetableItemsGroup));
+                    }
+
+                    resolve({
+                        deletedTimetableItemsGroupId: groupId,
                     });
                 },
             );

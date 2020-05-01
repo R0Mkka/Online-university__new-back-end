@@ -22,6 +22,7 @@ import { tryNumberParse } from '../helpers';
 import { registerOptions } from '../swagger/configs';
 import { UserDto } from '../swagger/classes/user';
 import { SuccessResponseDto } from '../swagger/classes/success-response';
+import { IChangePasswordData } from 'src/models/user-settings.models';
 
 @ApiInternalServerErrorResponse({ description: 'Server internal error' })
 @ApiUseTags(SwaggerTags.Users)
@@ -45,7 +46,7 @@ export class UsersController {
     @ApiUnauthorizedResponse({ description: 'You have to authorize and provide a token in headers' })
     @ApiNotFoundResponse({ description: 'User was not found' })
     public getCurrentUser(@Request() req: IAuthReq): Promise<IUser> {
-        return this.usersService.getUserById(req.user.userId);
+        return this.usersService.getUserById(req.user.userId) as Promise<IUser>;
     }
 
     @Post()
@@ -65,6 +66,17 @@ export class UsersController {
         const userId: number = tryNumberParse(userIdAsString);
 
         return this.usersService.modifyUser(modifyUserData, userId);
+    }
+
+    // TODO: Swagger
+    @Post(':userId/change-password')
+    public changeUserPassword(
+        @Body() changePasswordData: IChangePasswordData,
+        @Param('userId') userIdAsString: string,
+    ): Promise<ISqlSuccessResponse> {
+        const userId: number = tryNumberParse(userIdAsString);
+
+        return this.usersService.changeUserPassword(changePasswordData, userId);
     }
 
     // TODO: Add guard for only Admin access

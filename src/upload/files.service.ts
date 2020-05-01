@@ -37,7 +37,7 @@ export class FilesService {
   }
 
   public async uploadUserAvatar(avatar: IFile, userPayload: IUserLikePayload): Promise<IFile> {
-    const user: IUser = await this.usersService.getUserById(userPayload.userId);
+    const user: IUser = await this.usersService.getUserById(userPayload.userId) as IUser;
 
     if (!!user.avatar.id) {
       const filePath: string = this.getFilePath(user.avatar.name);

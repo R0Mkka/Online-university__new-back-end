@@ -1,4 +1,4 @@
-import { Controller, UseGuards, Get, Body, Request, Post } from '@nestjs/common';
+import { Controller, UseGuards, Get, Body, Request, Post, Delete, Param } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { ApiBearerAuth, ApiUseTags } from '@nestjs/swagger';
 
@@ -16,8 +16,10 @@ import {
     ICreatedTimetableItemsGroupInfo,
     INewTimetableItemsSticker,
     ICreatedTimetableItemsStickerInfo,
+    IDeletedTimetableItemsGroupInfo,
 } from '../models/timetable.models';
 import { SwaggerTags } from '../constants';
+import { tryNumberParse } from '../helpers';
 
 // Swagger
 @UseGuards(AuthGuard())
@@ -71,5 +73,15 @@ export class TimetableController {
         @Request() req: IAuthReq,
     ): Promise<ICreatedTimetableItemsStickerInfo> {
         return this.timetableService.createTimetableItemsSticker(req.user.userId, newTimetableItemsStickerData);
+    }
+
+    @Delete('items-groups/:groupId')
+    public deleteUserTimetableItemsGroup(
+        @Param('groupId') groupIdAsString: string,
+        @Request() req: IAuthReq,
+    ): Promise<IDeletedTimetableItemsGroupInfo> {
+        const groupId: number = tryNumberParse(groupIdAsString);
+
+        return this.timetableService.deleteTimetableItemsGroup(req.user.userId, groupId);
     }
 }
