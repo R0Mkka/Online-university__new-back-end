@@ -35,8 +35,10 @@ export class CourseItemsController {
 
   @Get(':courseItemId')
   @ApiNotFoundResponse({ description: 'Course item does not exist' })
-  public getCourseItem(): any {
-    // TODO
+  public getCourseItem(@Param('courseItemId') courseItemIdAsString: string): any {
+    const courseItemId: number = tryNumberParse(courseItemIdAsString);
+
+    return this.courseItemsService.getCourseItemById(courseItemId);
   }
 
   @Post()

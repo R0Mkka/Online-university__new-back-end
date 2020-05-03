@@ -51,6 +51,13 @@ export class CoursesController {
         return this.coursesService.getAllCourses();
     }
 
+    @Get(':courseId/course-items')
+    public getCourseItems(@Param('courseId') courseIdAsString: string): Promise<any> {
+        const courseId: number = tryNumberParse(courseIdAsString);
+
+        return this.coursesService.getCourseItems(courseId);
+    }
+
     // TODO: Think about getting courses only when users are in them
     @Get(':courseId')
     @ApiOkResponse({ description: 'Course full data', type: FullCourseDataDto })

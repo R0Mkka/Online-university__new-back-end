@@ -43,6 +43,15 @@ export class CourseItemsService {
     });
   }
 
+  public getCourseItemById(courseItemId: number): Promise<any> {
+    return new Promise(async (resolve, reject) => {
+      const courseItemData: ICourseItemData = await this.getCourseItemDataById(courseItemId);
+      const courseItem: ICourseItem = await this.getCourseItemFromCourseItemData(courseItemData);
+
+      resolve(courseItem);
+    });
+  }
+
   public removeCourseItem(courseItemId: number): Promise<ISqlSuccessResponse> {
     return new Promise((resolve, reject) => {
       db.query(
@@ -60,7 +69,7 @@ export class CourseItemsService {
   }
 
   public async modifyCourseItem(modifyCourseItemData: IModifyCourseItemData, courseItemId: number): Promise<any> { // TODO: Type
-    const courseItemData: ICourseItemData = await this.getCourseItemById(courseItemId);
+    const courseItemData: ICourseItemData = await this.getCourseItemDataById(courseItemId);
     const params: NumberOrString[] = this.getCourseItemModifyParams({ ...courseItemData, ...modifyCourseItemData });
 
     return new Promise((resolve, reject) => {
@@ -101,18 +110,18 @@ export class CourseItemsService {
     return params;
   }
 
-  private getCourseItemById(courseItemId: number): Promise<ICourseItemData> {
+  private getCourseItemDataById(courseItemId: number): Promise<ICourseItemData> {
     return new Promise((resolve, reject) => {
       db.query(
-        CourseItemsQueires.GetCourseItemById,
+        CourseItemsQueires.GetCourseItemDataById,
         [courseItemId],
         (error: Error, courseItemsData: ICourseItemData[]) => {
           if (error) {
-            return reject(newBadRequestException(CourseItemsQueryList.GetCourseItemById));
+            return reject(newBadRequestException(CourseItemsQueryList.GetCourseItemDataById));
           }
 
           if (!courseItemsData[0]) {
-            return reject(newNotFoundException(CourseItemsQueryList.GetCourseItemById));
+            return reject(newNotFoundException(CourseItemsQueryList.GetCourseItemDataById));
           }
 
           resolve(courseItemsData[0]);

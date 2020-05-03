@@ -4,7 +4,7 @@ export enum CourseItemsQueryList {
   CreateCourseItem = 'CreateCourseItem',
   RemoveCourseItem = 'RemoveCourseItem',
   ModifyCourseItem = 'ModifyCourseItem',
-  GetCourseItemById = 'GetCourseItemById',
+  GetCourseItemDataById = 'GetCourseItemDataById',
 }
 
 export const CourseItemsQueires: { [key in CourseItemsQueryList]: string } = {
@@ -36,7 +36,7 @@ export const CourseItemsQueires: { [key in CourseItemsQueryList]: string } = {
       courseItemId = ?;
   `,
 
-  GetCourseItemById: `
+  GetCourseItemDataById: `
     SELECT
       *
     FROM

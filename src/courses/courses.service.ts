@@ -63,6 +63,30 @@ export class CoursesService {
         });
     }
 
+    public getCourseItems(courseId: number): Promise<ICourseItem[]> {
+        return new Promise((resolve, reject) => {
+            db.query(
+                Queries.GetCourseItems,
+                [courseId],
+                async (error: Error, courseItemsData: ICourseItemData[]) => {
+                    if (error) {
+                        reject(newBadRequestException(CoursesQueryList.GetCourseItems));
+                    }
+
+                    const courseItems: ICourseItem[] = [];
+
+                    for (const courseItemData of courseItemsData) {
+                        const courseItem: ICourseItem = await this.courseItemsService.getCourseItemFromCourseItemData(courseItemData);
+
+                        courseItems.push(courseItem);
+                    }
+
+                    resolve(courseItems);
+                },
+            );
+        });
+    }
+
     public async getFullCourseData(courseId: number): Promise<IFullCourseData> {
         const courseWithoutContent: ICourseData = await this.getCourseById(courseId);
         const courseItems: ICourseItem[] = await this.getCourseItems(courseId);
@@ -274,30 +298,6 @@ export class CoursesService {
                     }
 
                     resolve(courses[0]);
-                },
-            );
-        });
-    }
-
-    private getCourseItems(courseId: number): Promise<ICourseItem[]> {
-        return new Promise((resolve, reject) => {
-            db.query(
-                Queries.GetCourseItems,
-                [courseId],
-                (error: Error, courseItemsData: ICourseItemData[]) => {
-                    if (error) {
-                        reject(newBadRequestException(CoursesQueryList.GetCourseItems));
-                    }
-
-                    const courseItems: ICourseItem[] = [];
-
-                    courseItemsData.forEach(async (courseItemData) => {
-                        const courseItem: ICourseItem = await this.courseItemsService.getCourseItemFromCourseItemData(courseItemData);
-
-                        courseItems.push(courseItem);
-                    });
-
-                    resolve(courseItems);
                 },
             );
         });
