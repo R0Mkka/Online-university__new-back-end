@@ -17,7 +17,7 @@ import { CoursesService } from './courses.service';
 import { NoStudentsGuard } from '../guards/no-students.guard';
 
 import { IAuthReq } from '../models/auth.models';
-import { ICourseCreationData, IJoinCourseData, ICourseData, IFullCourseData, IJoinedCourseData, IUserDeletedFromCourse, ICreatedCourseData } from '../models/courses.models';
+import { ICourseCreationData, IJoinCourseData, ICourseData, IFullCourseData, IJoinedCourseData, IUserDeletedFromCourse, ICreatedCourseData, ICourseItem } from '../models/courses.models';
 import { ISqlSuccessResponse } from '../models/common.models';
 import { SwaggerTags } from '../constants';
 import { tryNumberParse } from '../helpers';
@@ -52,7 +52,7 @@ export class CoursesController {
     }
 
     @Get(':courseId/course-items')
-    public getCourseItems(@Param('courseId') courseIdAsString: string): Promise<any> {
+    public getCourseItems(@Param('courseId') courseIdAsString: string): Promise<ICourseItem[]> {
         const courseId: number = tryNumberParse(courseIdAsString);
 
         return this.coursesService.getCourseItems(courseId);

@@ -1,15 +1,18 @@
 import { Injectable } from '@nestjs/common';
+import * as path from 'path';
+import * as fs from 'fs';
 
 import { UsersService } from '../users/users.service';
 
 import { Database } from '../database';
 import { CourseItemsQueryList, CourseItemsQueires } from './course-items.queries';
 
-import { ICreateCourseItemData, IModifyCourseItemData, ICourseItem, ICourseItemData, ICreatedCourseItemData } from '../models/courses.models';
+import { ICreateCourseItemData, IModifyCourseItemData, ICourseItem, ICourseItemData, ICreatedCourseItemData, ICourseItemAttachment } from '../models/courses.models';
 import { IUserLikePayload } from '../models/auth.models';
 import { ISqlSuccessResponse } from '../models/common.models';
 import { NumberOrString } from '../models/database.models';
 import { IUser } from '../models/users.models';
+import { IFile } from '../models/upload.models';
 import { newBadRequestException, newNotFoundException } from '../helpers';
 
 const db = Database.getInstance();
@@ -43,16 +46,75 @@ export class CourseItemsService {
     });
   }
 
-  public getCourseItemById(courseItemId: number): Promise<any> {
-    return new Promise(async (resolve, reject) => {
-      const courseItemData: ICourseItemData = await this.getCourseItemDataById(courseItemId);
-      const courseItem: ICourseItem = await this.getCourseItemFromCourseItemData(courseItemData);
+  public uploadCourseItemAttachments(attachments: IFile[], createdCourseItemId: number): Promise<any> {
+    const params = [] as any;
 
-      resolve(courseItem);
+    for (const attachment of attachments) {
+      params.push([
+        createdCourseItemId,
+        attachment.path,
+        attachment.filename,
+        attachment.originalname,
+        attachment.mimetype,
+        attachment.size,
+      ]);
+    }
+
+    return new Promise((resolve, reject) => {
+      db.query(
+        CourseItemsQueires.AddCourseItemAttachments,
+        [params],
+        (error: Error, _: ISqlSuccessResponse) => {
+          if (error) {
+            return reject(newBadRequestException(CourseItemsQueryList.AddCourseItemAttachments));
+          }
+
+          resolve({
+            createdCourseItemId,
+            addedFiles: attachments.map((file: IFile) => file.filename),
+          });
+        },
+      );
     });
   }
 
-  public removeCourseItem(courseItemId: number): Promise<ISqlSuccessResponse> {
+  public getCourseItemAttachments(courseItemId: number): Promise<ICourseItemAttachment[]> {
+    return new Promise((resolve, reject) => {
+      db.query(
+        CourseItemsQueires.GetCourseItemAttachments,
+        [courseItemId],
+        (error: Error, attachmentList: ICourseItemAttachment[]) => {
+          if (error) {
+            return reject(newBadRequestException(CourseItemsQueryList.GetCourseItemAttachments));
+          }
+
+          resolve(attachmentList);
+        },
+      );
+    });
+  }
+
+  public getCourseItemById(courseItemId: number): Promise<ICourseItem> {
+    return new Promise(async (resolve, reject) => {
+      try {
+        const courseItemData: ICourseItemData = await this.getCourseItemDataById(courseItemId);
+        const courseItem: ICourseItem = await this.getCourseItemFromCourseItemData(courseItemData);
+
+        resolve(courseItem);
+      } catch (error) {
+        reject(error);
+      }
+    });
+  }
+
+  public async removeCourseItem(courseItemId: number): Promise<ISqlSuccessResponse> {
+    const courseItem = await this.getCourseItemById(courseItemId);
+
+    if (courseItem.attachments.length !== 0) {
+      console.log('files');
+      await this.removeAttachmentsFiles(courseItem.attachments);
+    }
+
     return new Promise((resolve, reject) => {
       db.query(
         CourseItemsQueires.RemoveCourseItem,
@@ -91,8 +153,9 @@ export class CourseItemsService {
     const { creatorId, ...otherCourseItemData } = courseItemData;
 
     const user: IUser = await this.usersService.getUserById(creatorId) as IUser;
+    const attachments: ICourseItemAttachment[] = await this.getCourseItemAttachments(courseItemData.courseItemId);
 
-    return { ...otherCourseItemData, creator: user };
+    return { ...otherCourseItemData, attachments, creator: user };
   }
 
   private getCourseItemCreationParams(
@@ -138,5 +201,27 @@ export class CourseItemsService {
     params.push(modifiedCourseItemData.courseItemId);
 
     return params;
+  }
+
+  private removeAttachmentsFiles(attachments: ICourseItemAttachment[]): Promise<void> {
+    return new Promise((resolve, reject) => {
+      let filesLeft = attachments.length;
+
+      for (const file of attachments) {
+        const filePath = path.join(__dirname, '../', '../', 'attachments', file.name);
+
+        fs.unlink(filePath, (error: Error) => {
+          if (error) {
+            return reject(newBadRequestException(`RemoveAttachmentsFiles:${file.name}`));
+          }
+
+          filesLeft--;
+
+          if (filesLeft === 0) {
+            resolve();
+          }
+        });
+      }
+    });
   }
 }

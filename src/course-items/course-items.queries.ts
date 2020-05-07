@@ -5,6 +5,8 @@ export enum CourseItemsQueryList {
   RemoveCourseItem = 'RemoveCourseItem',
   ModifyCourseItem = 'ModifyCourseItem',
   GetCourseItemDataById = 'GetCourseItemDataById',
+  AddCourseItemAttachments = 'AddCourseItemAttachments',
+  GetCourseItemAttachments = 'GetCourseItemAttachments',
 }
 
 export const CourseItemsQueires: { [key in CourseItemsQueryList]: string } = {
@@ -16,6 +18,27 @@ export const CourseItemsQueires: { [key in CourseItemsQueryList]: string } = {
       courseItemTitle,
       courseItemtextContent
     ) VALUES (?,?,?,?,?);
+  `,
+
+  AddCourseItemAttachments: `
+      INSERT INTO ${DBTables.CoursesItemsAttachments} (
+        courseItemId,
+        path,
+        name,
+        originalName,
+        mimeType,
+        size
+      )
+      VALUES ?;
+  `,
+
+  GetCourseItemAttachments: `
+      SELECT
+        *
+      FROM
+        ${DBTables.CoursesItemsAttachments}
+      WHERE
+        courseItemId = ?;
   `,
 
   RemoveCourseItem: `

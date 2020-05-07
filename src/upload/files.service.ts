@@ -22,9 +22,9 @@ export class FilesService {
     private readonly usersService: UsersService,
   ) {}
 
-  public getFileByName(fileName: string): Promise<string> {
+  public getFileByName(fileName: string, directory: string = 'files'): Promise<string> {
     return new Promise((resolve, reject) => {
-      const filePath: string = this.getFilePath(fileName);
+      const filePath: string = this.getFilePath(fileName, directory);
 
       fs.exists(filePath, (exists: boolean) => {
         if (!exists) {
@@ -69,8 +69,8 @@ export class FilesService {
     });
   }
 
-  private getFilePath(fileName: string): string {
-    return path.join(__dirname, '../', '../', 'files', fileName);
+  private getFilePath(fileName: string, directory: string = 'files'): string {
+    return path.join(__dirname, '../', '../', directory, fileName);
   }
 
   private getUploadUserAvatarParams(avatar: IFile): NumberOrString[] {

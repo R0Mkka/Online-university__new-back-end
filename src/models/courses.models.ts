@@ -42,6 +42,7 @@ export interface ICourseItemData {
     creatorId: number;
     courseItemTitle: string;
     courseItemTextContent: string;
+    isEdited: 0 | 1;
     addedAt: string;
 }
 
@@ -59,7 +60,20 @@ export interface IModifyCourseItemData {
 
 export interface ICourseItem extends ICreateCourseItemData {
     courseItemId: number;
+    attachments: ICourseItemAttachment[];
     creator: IUser;
+    isEdited: 0 | 1;
+    addedAt: string;
+}
+
+export interface ICourseItemAttachment {
+    courseItemAttachmentId: number;
+    courseItemId: number;
+    path: string;
+    name: string;
+    originalName: string;
+    mimeType: string;
+    size: number;
     addedAt: string;
 }
 

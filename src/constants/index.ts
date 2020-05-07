@@ -10,6 +10,7 @@ export enum DBTables {
     CoursesPictures = 'courses_pictures',
     CoursesColorPalettes = 'courses_color_palettes',
     CoursesItems = 'courses_items',
+    CoursesItemsAttachments = 'courses_items_attachments',
     Chats = 'chats',
     ChatsImages = 'chats_images',
     UsersChats = 'users_chats',
