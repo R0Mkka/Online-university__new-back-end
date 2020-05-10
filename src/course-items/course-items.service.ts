@@ -70,10 +70,12 @@ export class CourseItemsService {
             return reject(newBadRequestException(CourseItemsQueryList.EditCourseItem));
           }
 
-          try {
-            await this.markCourseItemAsEdited(courseItemId);
-          } catch (error) {
-            return reject(newBadRequestException(CourseItemsQueryList.MarkCourseItemAdEdited));
+          if (!courseItem.isEdited) {
+            try {
+              await this.markCourseItemAsEdited(courseItemId);
+            } catch (error) {
+              return reject(newBadRequestException(CourseItemsQueryList.MarkCourseItemAdEdited));
+            }
           }
 
           resolve({
@@ -172,49 +174,64 @@ export class CourseItemsService {
           const generatedName = `${uuidv4()}.${mime.getExtension(file.mimetype)}`;
           const filePath = path.join(__dirname, '../', '../', 'attachments', generatedName);
 
-          await new Promise((res, rej) => {
-            fs.writeFile(filePath, (file as any).buffer, (err) => {
-              if (err) {
-                return rej(err);
-              }
+          file.path = `attachments\\${generatedName}`;
+          file.filename = generatedName;
 
-              res();
+          try {
+            await new Promise((res, rej) => {
+              fs.writeFile(filePath, (file as any).buffer, (err) => {
+                if (err) {
+                  return rej(err);
+                }
+  
+                res();
+              });
             });
-          });
+          } catch (error) {
+            return reject(newBadRequestException('AddedFilesCreation'));
+          }
         }
 
-        resolve({ addedFiles });
+        resolve(addedFiles);
       }),
       new Promise(async (resolve, reject) => {
         for (const file of deletedFiles) {
           const generatedName = `${uuidv4()}.${mime.getExtension(file.mimeType)}`;
           const filePath = path.join(__dirname, '../', '../', 'attachments', file.name);
 
-          await new Promise((res, rej) => {
-            fs.unlink(filePath, (err) => {
-              if (err) {
-                return rej(err);
-              }
+          try {
+            await new Promise((res, rej) => {
+              fs.unlink(filePath, (err) => {
+                if (err) {
+                  return rej(err);
+                }
 
-              res();
+                res();
+              });
             });
-          });
+          } catch (error) {
+            return reject(newBadRequestException('DeletedFilesCreation'));
+          }
         }
 
-        resolve({ deletedFiles });
+        resolve(deletedFiles);
       }),
     ])
     .then(async ([added, deleted]: [ IFile[], ICourseItemAttachment[] ]) => {
-      try {
-        await this.addCourseItemAttachmentsToDB(added, courseItemId);
-      } catch (err) {
-        throw new Error(err);
+      if (added.length !== 0) {
+        try {
+          await this.addCourseItemAttachmentsToDB(added, courseItemId);
+        } catch (err) {
+          throw new Error(err);
+        }
       }
 
-      try {
-        await this.deleteCourseItemAttachmentsFromDB(deleted, courseItemId);
-      } catch (err) {
-        throw new Error(err);
+      if (deleted.length !== 0) {
+        try {
+          await this.deleteCourseItemAttachmentsFromDB(deleted, courseItemId);
+        } catch (err) {
+          throw new Error(err);
+        }
       }
 
       if (!courseItem.isEdited) {
