@@ -1,6 +1,8 @@
 import { Injectable } from '@nestjs/common';
+import { v4 as uuidv4 } from 'uuid';
 import * as path from 'path';
 import * as fs from 'fs';
+import * as mime from 'mime';
 
 import { UsersService } from '../users/users.service';
 
@@ -46,12 +48,53 @@ export class CourseItemsService {
     });
   }
 
-  public uploadCourseItemAttachments(attachments: IFile[], createdCourseItemId: number): Promise<any> {
+  // TODO: Types
+  public editCourseItem(
+    editCourseItemData: ICreateCourseItemData,
+    courseItemId: number,
+  ): Promise<any> {
+    return new Promise(async (resolve, reject) => {
+      const courseItem = await this.getCourseItemById(courseItemId);
+      const { courseItemTypeId, courseItemTitle, courseItemTextContent } = editCourseItemData;
+
+      db.query(
+        CourseItemsQueires.EditCourseItem,
+        [
+          courseItemTypeId,
+          courseItemTitle,
+          courseItemTextContent,
+          courseItemId,
+        ],
+        async (error: Error, _: ISqlSuccessResponse) => {
+          if (error) {
+            return reject(newBadRequestException(CourseItemsQueryList.EditCourseItem));
+          }
+
+          try {
+            await this.markCourseItemAsEdited(courseItemId);
+          } catch (error) {
+            return reject(newBadRequestException(CourseItemsQueryList.MarkCourseItemAdEdited));
+          }
+
+          resolve({
+            editedCourseItemData: {
+              courseItemId,
+              courseItemTypeId,
+              courseItemTitle,
+              courseItemTextContent,
+            },
+          });
+        },
+      );
+    });
+  }
+
+  public addCourseItemAttachmentsToDB(attachments: IFile[], courseItemId: number): Promise<any> {
     const params = [] as any;
 
     for (const attachment of attachments) {
       params.push([
-        createdCourseItemId,
+        courseItemId,
         attachment.path,
         attachment.filename,
         attachment.originalname,
@@ -70,9 +113,139 @@ export class CourseItemsService {
           }
 
           resolve({
-            createdCourseItemId,
+            courseItemId,
             addedFiles: attachments.map((file: IFile) => file.filename),
           });
+        },
+      );
+    });
+  }
+
+  public deleteCourseItemAttachmentsFromDB(attachments: ICourseItemAttachment[], courseItemId: number): Promise<any> {
+    const params = attachments.map(({ courseItemAttachmentId }: ICourseItemAttachment) => {
+      return [courseItemAttachmentId, courseItemId];
+    });
+
+    return new Promise((resolve, reject) => {
+      db.query(
+        CourseItemsQueires.DeleteCourseItemAttachments,
+        [params as any],
+        (error: Error, deleteingInfo: ISqlSuccessResponse) => {
+          if (error) {
+            return reject(newBadRequestException(CourseItemsQueryList.DeleteCourseItemAttachments));
+          }
+
+          resolve(deleteingInfo);
+        },
+      );
+    });
+  }
+
+  public async editCourseItemAttachments(newAttachments: IFile[], courseItemId: number): Promise<any> {
+    const courseItem = await this.getCourseItemById(courseItemId);
+    const addedFiles: IFile[] = [];
+    const deletedFiles: ICourseItemAttachment[] = [];
+
+    for (const newAttachment of newAttachments) {
+      const contains = courseItem.attachments.some((existingAttachment) => {
+        return newAttachment.size === existingAttachment.size;
+      });
+
+      if (!contains) {
+        addedFiles.push(newAttachment);
+      }
+    }
+
+    for (const existingAttachment of courseItem.attachments) {
+      const contains = newAttachments.some((newAttachment) => {
+        return newAttachment.size === existingAttachment.size;
+      });
+
+      if (!contains) {
+        deletedFiles.push(existingAttachment);
+      }
+    }
+
+    return Promise.all([
+      new Promise(async (resolve, reject) => {
+        for (const file of addedFiles) {
+          const generatedName = `${uuidv4()}.${mime.getExtension(file.mimetype)}`;
+          const filePath = path.join(__dirname, '../', '../', 'attachments', generatedName);
+
+          await new Promise((res, rej) => {
+            fs.writeFile(filePath, (file as any).buffer, (err) => {
+              if (err) {
+                return rej(err);
+              }
+
+              res();
+            });
+          });
+        }
+
+        resolve({ addedFiles });
+      }),
+      new Promise(async (resolve, reject) => {
+        for (const file of deletedFiles) {
+          const generatedName = `${uuidv4()}.${mime.getExtension(file.mimeType)}`;
+          const filePath = path.join(__dirname, '../', '../', 'attachments', file.name);
+
+          await new Promise((res, rej) => {
+            fs.unlink(filePath, (err) => {
+              if (err) {
+                return rej(err);
+              }
+
+              res();
+            });
+          });
+        }
+
+        resolve({ deletedFiles });
+      }),
+    ])
+    .then(async ([added, deleted]: [ IFile[], ICourseItemAttachment[] ]) => {
+      try {
+        await this.addCourseItemAttachmentsToDB(added, courseItemId);
+      } catch (err) {
+        throw new Error(err);
+      }
+
+      try {
+        await this.deleteCourseItemAttachmentsFromDB(deleted, courseItemId);
+      } catch (err) {
+        throw new Error(err);
+      }
+
+      if (!courseItem.isEdited) {
+        try {
+          await this.markCourseItemAsEdited(courseItemId);
+        } catch (err) {
+          throw new Error(err);
+        }
+      }
+
+      return {
+        added: added.map((file) => file.originalname),
+        deleted: deleted.map((file) => file.originalName),
+      };
+    })
+    .catch(() => {
+      return newBadRequestException('EditCourseItemAttachments');
+    });
+  }
+
+  public markCourseItemAsEdited(courseItemId: number): Promise<any> {
+    return new Promise((resolve, reject) => {
+      db.query(
+        CourseItemsQueires.MarkCourseItemAdEdited,
+        [courseItemId],
+        (error: Error, editingInfo: ISqlSuccessResponse) => {
+          if (error) {
+            return reject(newBadRequestException(CourseItemsQueryList.MarkCourseItemAdEdited));
+          }
+
+          resolve(editingInfo);
         },
       );
     });
@@ -111,7 +284,6 @@ export class CourseItemsService {
     const courseItem = await this.getCourseItemById(courseItemId);
 
     if (courseItem.attachments.length !== 0) {
-      console.log('files');
       await this.removeAttachmentsFiles(courseItem.attachments);
     }
 

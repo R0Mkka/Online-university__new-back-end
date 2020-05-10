@@ -1,6 +1,7 @@
 import { PayloadTooLargeException } from '@nestjs/common';
 import { MulterOptions } from '@nestjs/platform-express/multer/interfaces/multer-options.interface';
 import { diskStorage } from 'multer';
+import { v4 as uuidv4 } from 'uuid';
 import * as mime from 'mime';
 
 import { IFile } from '../models/upload.models';
@@ -23,7 +24,7 @@ export const attachmentsOptions: MulterOptions = {
         return callback(new PayloadTooLargeException('Maximum file size is 3mb!'));
       }
 
-      callback(null, `${Date.now().toString()}.${mime.getExtension(file.mimetype)}`);
+      callback(null, `${uuidv4()}.${mime.getExtension(file.mimetype)}`);
     },
   }),
 };

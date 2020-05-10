@@ -57,6 +57,18 @@ export class CourseItemsController {
     return this.courseItemsService.createCourseItem(createCourseItemData, req.user);
   }
 
+  // TODO: Swagger, types
+  @Patch(':courseItemId')
+  @UseGuards(NoStudentsGuard)
+  public editCourseItem(
+    @Body() editCourseItemData: ICreateCourseItemData,
+    @Param('courseItemId') courseItemIdAsString: string,
+  ): Promise<ICreatedCourseItemData> {
+    const courseItemId = tryNumberParse(courseItemIdAsString);
+
+    return this.courseItemsService.editCourseItem(editCourseItemData, courseItemId);
+  }
+
   @Get('attachments/:name')
   public async getFile(
     @Param('name') attachmentName: string,
@@ -76,10 +88,23 @@ export class CourseItemsController {
   ): Promise<any> {
     const createdCourseItemIdAsNumber = tryNumberParse(body.createdCourseItemId);
 
-    return this.courseItemsService.uploadCourseItemAttachments(
+    return this.courseItemsService.addCourseItemAttachmentsToDB(
       attachments,
       createdCourseItemIdAsNumber,
     );
+  }
+
+  // TODO
+  @Post('attachments/edit')
+  @UseGuards(NoStudentsGuard)
+  @UseInterceptors(FilesInterceptor('file', 5))
+  public editCourseItemAttachments(
+    @Body() body: { editingCourseItemId: string },
+    @UploadedFiles() files: any[],
+  ): Promise<any> {
+    const editingCourseItemId = tryNumberParse(body.editingCourseItemId);
+
+    return this.courseItemsService.editCourseItemAttachments(files, editingCourseItemId);
   }
 
   @Delete(':courseItemId')
