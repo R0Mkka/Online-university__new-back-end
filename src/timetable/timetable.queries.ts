@@ -48,10 +48,11 @@ export const TimetableQueries: { [key in TimetableQueryList]: string } = {
             teacherFullName,
             onlineMeeting,
             classroom,
+            comment,
             startTime,
             endTime
         )
-        VALUES (?,?,?,?,?,?,?,?,?,?);
+        VALUES (?,?,?,?,?,?,?,?,?,?,?);
     `,
 
     CreateTimetableItemsGroup: `

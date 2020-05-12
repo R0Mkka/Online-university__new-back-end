@@ -98,6 +98,7 @@ export class TimetableService {
                     newTimetableItem.teacherFullName,
                     newTimetableItem.onlineMeeting,
                     newTimetableItem.classroom,
+                    newTimetableItem.comment,
                     newTimetableItem.startTime,
                     newTimetableItem.endTime,
                 ],

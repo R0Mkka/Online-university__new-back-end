@@ -14,6 +14,7 @@ export interface ITimetableItem {
     teacherFullName: string;
     onlineMeeting: string | null;
     classroom: string | null;
+    comment: string | null;
     startTime: string;
     endTime: string;
 }
@@ -44,6 +45,7 @@ export interface INewTimetableItem {
     teacherFullName: string;
     onlineMeeting: string | null;
     classroom: string | null;
+    comment: string | null;
     startTime: string;
     endTime: string;
 }
@@ -74,11 +76,11 @@ export interface ICreatedTimetableItemsStickerInfo {
 }
 
 export enum DaysOfTheWeek {
+    Sunday = 0,
     Monday = 1,
     Tuesday = 2,
     Wednesday = 3,
     Thursday = 4,
     Friday = 5,
     Saturday = 6,
-    Sunday = 7,
 }
