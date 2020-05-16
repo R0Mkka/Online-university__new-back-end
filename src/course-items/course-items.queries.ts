@@ -24,7 +24,8 @@ export const CourseItemsQueires: { [key in CourseItemsQueryList]: string } = {
   `,
 
   EditCourseItem: `
-    UPDATE ${DBTables.CoursesItems}
+    UPDATE
+      ${DBTables.CoursesItems}
       SET courseItemTypeId = ?,
           courseItemTitle = ?,
           courseItemtextContent = ?

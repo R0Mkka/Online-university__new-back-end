@@ -15,6 +15,8 @@ import {
     INewTimetableItemsSticker,
     ICreatedTimetableItemsStickerInfo,
     IDeletedTimetableItemsGroupInfo,
+    IEditedTimetableItemsGroup,
+    IEditedTimetableItemsGroupInfo,
 } from '../models/timetable.models';
 import { ISqlSuccessResponse } from '../models/common.models';
 import { newBadRequestException } from '../helpers';
@@ -125,6 +127,7 @@ export class TimetableService {
                 [
                     userId,
                     newTimetableItemsGroupData.name,
+                    newTimetableItemsGroupData.isPrivate,
                 ],
                 (error: Error, creationInfo: ISqlSuccessResponse) => {
                     if (error) {
@@ -158,6 +161,33 @@ export class TimetableService {
 
                     resolve({
                         newTimetableItemStickerId: creationInfo.insertId,
+                    });
+                },
+            );
+        });
+    }
+
+    public editTimetableItemsGroup(
+        userId: number,
+        groupId: number,
+        editedTimetableItemsGroupData: IEditedTimetableItemsGroup,
+    ): Promise<IEditedTimetableItemsGroupInfo> {
+        return new Promise((resolve, reject) => {
+            db.query(
+                TimetableQueries.UpdateTimetableItemsGroup,
+                [
+                    editedTimetableItemsGroupData.name,
+                    editedTimetableItemsGroupData.isPrivate,
+                    userId,
+                    groupId,
+                ],
+                (error: Error, _: ISqlSuccessResponse) => {
+                    if (error) {
+                        return reject(newBadRequestException(TimetableQueryList.UpdateTimetableItemsGroup));
+                    }
+
+                    resolve({
+                        editedTimetableItemsGroupId: groupId,
                     });
                 },
             );

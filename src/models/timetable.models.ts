@@ -23,6 +23,7 @@ export interface ITimetableItemGroup {
     timetableItemGroupId: number;
     userId: number;
     name: string;
+    isPrivate: 1 | 0;
 }
 
 export interface ITimetableItemSticker {
@@ -56,10 +57,20 @@ export interface ICreatedTimetableItemInfo {
 
 export interface INewTimetableItemsGroup {
     name: string;
+    isPrivate: 1 | 0;
+}
+
+export interface IEditedTimetableItemsGroup {
+    name: string;
+    isPrivate: 1 | 0;
 }
 
 export interface ICreatedTimetableItemsGroupInfo {
     newTimetableItemsGroupId: number;
+}
+
+export interface IEditedTimetableItemsGroupInfo {
+    editedTimetableItemsGroupId: number;
 }
 
 export interface IDeletedTimetableItemsGroupInfo {
