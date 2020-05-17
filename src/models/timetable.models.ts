@@ -30,7 +30,9 @@ export interface ITimetableItemSticker {
     timetableItemStickerId: number;
     userId: number;
     title: string;
+    abbreviation: string;
     color: string;
+    isCommon: 1 | 0;
 }
 
 export interface IDayOfTheWeek {
@@ -80,6 +82,7 @@ export interface IDeletedTimetableItemsGroupInfo {
 export interface INewTimetableItemsSticker {
     title: string;
     color: string;
+    abbreviation: string;
 }
 
 export interface ICreatedTimetableItemsStickerInfo {

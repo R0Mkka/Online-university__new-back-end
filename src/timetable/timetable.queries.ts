@@ -9,6 +9,7 @@ export enum TimetableQueryList {
     UpdateTimetableItemsGroup = 'UpdateTimetableItemsGroup',
     CreateTimetableItemsSticker = 'CreateTimetableItemsSticker',
     DeleteTimetableItemsGroup = 'DeleteTimetableItemsGroup',
+    CreateUserStickerConnection = 'CreateUserStickerConnection',
 }
 
 export const TimetableQueries: { [key in TimetableQueryList]: string } = {
@@ -35,8 +36,10 @@ export const TimetableQueries: { [key in TimetableQueryList]: string } = {
             *
         FROM
             ${DBTables.TimetableItemStickers}
+        LEFT JOIN ${DBTables.UsersTimetableItemsStickers}
+            USING (timetableItemStickerId)
         WHERE
-            userId = ?;
+            userId = ? OR isCommon = TRUE;
     `,
 
     CreateTimetableItem: `
@@ -77,9 +80,9 @@ export const TimetableQueries: { [key in TimetableQueryList]: string } = {
 
     CreateTimetableItemsSticker: `
         INSERT INTO ${DBTables.TimetableItemStickers} (
-            userId,
             title,
-            color
+            color,
+            abbreviation
         )
         VALUES (?,?,?);
     `,
@@ -90,5 +93,13 @@ export const TimetableQueries: { [key in TimetableQueryList]: string } = {
             ${DBTables.TimetableItemGroups}
         WHERE
             userId = ? AND timetableItemGroupId = ?;
+    `,
+
+    CreateUserStickerConnection: `
+        INSERT INTO ${DBTables.UsersTimetableItemsStickers} (
+            userId,
+            timetableItemStickerId
+        )
+        VALUES (?,?);
     `,
 };

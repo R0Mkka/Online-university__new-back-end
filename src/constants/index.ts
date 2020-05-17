@@ -21,6 +21,7 @@ export enum DBTables {
     TimetableItemGroups = 'timetable_item_groups',
     TimetableItemStickers = 'timetable_item_stickers',
     TimetableItemsTimetableItemsStickers = 'timetable_items_timetable_items_stickers',
+    UsersTimetableItemsStickers = 'users_timetable_items_stickers',
 }
 
 export enum SwaggerTags {

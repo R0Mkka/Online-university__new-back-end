@@ -150,18 +150,24 @@ export class TimetableService {
             db.query(
                 TimetableQueries.CreateTimetableItemsSticker,
                 [
-                    userId,
                     newTimetableItemsStickerData.title,
                     newTimetableItemsStickerData.color,
+                    newTimetableItemsStickerData.abbreviation,
                 ],
-                (error: Error, creationInfo: ISqlSuccessResponse) => {
+                async (error: Error, creationInfo: ISqlSuccessResponse) => {
                     if (error) {
                         return reject(newBadRequestException(TimetableQueryList.CreateTimetableItemsSticker));
                     }
 
-                    resolve({
-                        newTimetableItemStickerId: creationInfo.insertId,
-                    });
+                    const resp = await this.createUserStickerConnection(userId, creationInfo.insertId);
+
+                    if (typeof resp.insertId === 'number') {
+                        resolve({
+                            newTimetableItemStickerId: creationInfo.insertId,
+                        });
+                    } else {
+                        reject(newBadRequestException(TimetableQueryList.UpdateTimetableItemsGroup));
+                    }
                 },
             );
         });
@@ -207,6 +213,22 @@ export class TimetableService {
                     resolve({
                         deletedTimetableItemsGroupId: groupId,
                     });
+                },
+            );
+        });
+    }
+
+    private createUserStickerConnection(userId: number, stickerId: number): Promise<ISqlSuccessResponse> {
+        return new Promise((resolve, reject) => {
+            db.query(
+                TimetableQueries.CreateUserStickerConnection,
+                [userId, stickerId],
+                (error: Error, successResponse: ISqlSuccessResponse) => {
+                    if (error) {
+                        return reject(newBadRequestException(TimetableQueries.CreateUserStickerConnection));
+                    }
+
+                    resolve(successResponse);
                 },
             );
         });
