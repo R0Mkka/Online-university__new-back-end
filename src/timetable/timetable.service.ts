@@ -18,6 +18,9 @@ import {
     IEditedTimetableItemsGroup,
     IEditedTimetableItemsGroupInfo,
     IStickData,
+    IDeletedTimetableItemInfo,
+    IEditedTimetableItem,
+    IEditedTimetableItemInfo,
 } from '../models/timetable.models';
 import { ISqlSuccessResponse } from '../models/common.models';
 import { newBadRequestException } from '../helpers';
@@ -198,19 +201,36 @@ export class TimetableService {
         });
     }
 
-    public deleteStickerFromItem(stickData: IStickData): Promise<ISqlSuccessResponse> {
-        const { timetableItemId, timetableItemStickerId } = stickData;
-
+    public editTimetableItem(
+        userId: number,
+        itemId: number,
+        editedTimetableItemData: IEditedTimetableItem,
+    ): Promise<IEditedTimetableItemInfo> {
         return new Promise((resolve, reject) => {
             db.query(
-                TimetableQueries.DeleteStickerFromItem,
-                [timetableItemId, timetableItemStickerId],
-                (error: Error, deleteingInfo: ISqlSuccessResponse) => {
+                TimetableQueries.UpdateTimetableItem,
+                [
+                    editedTimetableItemData.dayOfTheWeekId,
+                    editedTimetableItemData.courseId,
+                    editedTimetableItemData.timetableItemGroupId,
+                    editedTimetableItemData.subject,
+                    editedTimetableItemData.teacherFullName,
+                    editedTimetableItemData.onlineMeeting,
+                    editedTimetableItemData.classroom,
+                    editedTimetableItemData.comment,
+                    editedTimetableItemData.startTime,
+                    editedTimetableItemData.endTime,
+                    userId,
+                    itemId,
+                ],
+                (error: Error, _: ISqlSuccessResponse) => {
                     if (error) {
-                        return reject(newBadRequestException(TimetableQueryList.DeleteStickerFromItem));
+                        return reject(newBadRequestException(TimetableQueryList.UpdateTimetableItem));
                     }
 
-                    resolve(deleteingInfo);
+                    resolve({
+                        editedTimetableItemId: itemId,
+                    });
                 },
             );
         });
@@ -243,6 +263,24 @@ export class TimetableService {
         });
     }
 
+    public deleteTimetableItem(userId: number, itemId: number): Promise<IDeletedTimetableItemInfo> {
+        return new Promise((resolve, reject) => {
+            db.query(
+                TimetableQueries.DeleteTimetableItem,
+                [userId, itemId],
+                (error: Error, _: ISqlSuccessResponse) => {
+                    if (error) {
+                        return reject(newBadRequestException(TimetableQueryList.DeleteTimetableItem));
+                    }
+
+                    resolve({
+                        deletedTimetableItemId: itemId,
+                    });
+                },
+            );
+        });
+    }
+
     public deleteTimetableItemsGroup(userId: number, groupId: number): Promise<IDeletedTimetableItemsGroupInfo> {
         return new Promise((resolve, reject) => {
             db.query(
@@ -256,6 +294,24 @@ export class TimetableService {
                     resolve({
                         deletedTimetableItemsGroupId: groupId,
                     });
+                },
+            );
+        });
+    }
+
+    public deleteStickerFromItem(stickData: IStickData): Promise<ISqlSuccessResponse> {
+        const { timetableItemId, timetableItemStickerId } = stickData;
+
+        return new Promise((resolve, reject) => {
+            db.query(
+                TimetableQueries.DeleteStickerFromItem,
+                [timetableItemId, timetableItemStickerId],
+                (error: Error, deleteingInfo: ISqlSuccessResponse) => {
+                    if (error) {
+                        return reject(newBadRequestException(TimetableQueryList.DeleteStickerFromItem));
+                    }
+
+                    resolve(deleteingInfo);
                 },
             );
         });

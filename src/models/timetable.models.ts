@@ -68,12 +68,33 @@ export interface IEditedTimetableItemsGroup {
     isPrivate: 1 | 0;
 }
 
+export interface IEditedTimetableItem {
+    dayOfTheWeekId: DaysOfTheWeek;
+    courseId: number | null;
+    timetableItemGroupId: number | null;
+    subject: string;
+    teacherFullName: string;
+    onlineMeeting: string | null;
+    classroom: string | null;
+    comment: string | null;
+    startTime: string;
+    endTime: string;
+}
+
 export interface ICreatedTimetableItemsGroupInfo {
     newTimetableItemsGroupId: number;
 }
 
+export interface IEditedTimetableItemInfo {
+    editedTimetableItemId: number;
+}
+
 export interface IEditedTimetableItemsGroupInfo {
     editedTimetableItemsGroupId: number;
+}
+
+export interface IDeletedTimetableItemInfo {
+    deletedTimetableItemId: number;
 }
 
 export interface IDeletedTimetableItemsGroupInfo {
