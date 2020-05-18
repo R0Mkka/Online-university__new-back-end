@@ -8,7 +8,10 @@ export enum TimetableQueryList {
     CreateTimetableItemsGroup = 'CreateTimetableItemsGroup',
     UpdateTimetableItemsGroup = 'UpdateTimetableItemsGroup',
     CreateTimetableItemsSticker = 'CreateTimetableItemsSticker',
+    AddStickerToItem = 'AddStickerToItem',
+    DeleteStickerFromItem = 'DeleteStickerFromItem',
     DeleteTimetableItemsGroup = 'DeleteTimetableItemsGroup',
+    GetAddedStickersToTimetableItem = 'GetAddedStickersToTimetableItem',
     CreateUserStickerConnection = 'CreateUserStickerConnection',
 }
 
@@ -87,12 +90,48 @@ export const TimetableQueries: { [key in TimetableQueryList]: string } = {
         VALUES (?,?,?);
     `,
 
+    AddStickerToItem: `
+        INSERT INTO ${DBTables.TimetableItemsTimetableItemsStickers} (
+            timetableItemId,
+            timetableItemStickerId
+        )
+        VALUES (?,?);
+    `,
+
+    DeleteStickerFromItem: `
+        DELETE
+        FROM
+            ${DBTables.TimetableItemsTimetableItemsStickers}
+        WHERE
+            timetableItemId = ? AND timetableItemStickerId = ?;
+    `,
+
     DeleteTimetableItemsGroup: `
         DELETE
         FROM
             ${DBTables.TimetableItemGroups}
         WHERE
             userId = ? AND timetableItemGroupId = ?;
+    `,
+
+    GetAddedStickersToTimetableItem: `
+        SELECT
+            timetableItemStickerId,
+            title,
+            color,
+            abbreviation,
+            isCommon,
+            userId
+        FROM
+            ${DBTables.TimetableItemStickers}
+        LEFT JOIN
+            ${DBTables.TimetableItemsTimetableItemsStickers}
+        USING(timetableItemStickerId)
+        LEFT JOIN
+            ${DBTables.UsersTimetableItemsStickers}
+        USING(timetableItemStickerId)
+        WHERE
+            timetableItemId = ?;
     `,
 
     CreateUserStickerConnection: `

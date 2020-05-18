@@ -17,6 +17,7 @@ export interface ITimetableItem {
     comment: string | null;
     startTime: string;
     endTime: string;
+    stickers: ITimetableItemSticker[];
 }
 
 export interface ITimetableItemGroup {
@@ -87,6 +88,11 @@ export interface INewTimetableItemsSticker {
 
 export interface ICreatedTimetableItemsStickerInfo {
     newTimetableItemStickerId: number;
+}
+
+export interface IStickData {
+    timetableItemId: number;
+    timetableItemStickerId: number;
 }
 
 export enum DaysOfTheWeek {

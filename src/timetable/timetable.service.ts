@@ -17,6 +17,7 @@ import {
     IDeletedTimetableItemsGroupInfo,
     IEditedTimetableItemsGroup,
     IEditedTimetableItemsGroupInfo,
+    IStickData,
 } from '../models/timetable.models';
 import { ISqlSuccessResponse } from '../models/common.models';
 import { newBadRequestException } from '../helpers';
@@ -44,9 +45,15 @@ export class TimetableService {
             db.query(
                 TimetableQueries.GetUserTimetableItems,
                 [userId],
-                (error: Error, userTimetableItems: ITimetableItem[]) => {
+                async (error: Error, userTimetableItems: ITimetableItem[]) => {
                     if (error) {
                         return reject(newBadRequestException(TimetableQueryList.GetUserTimetableItems));
+                    }
+
+                    for (const item of userTimetableItems) {
+                        const addedStickers = await this.getTimetableItemStickers(item.timetableItemId);
+
+                        item.stickers = addedStickers;
                     }
 
                     resolve(userTimetableItems);
@@ -173,6 +180,42 @@ export class TimetableService {
         });
     }
 
+    public addStickerToItem(stickData: IStickData): Promise<ISqlSuccessResponse> {
+        const { timetableItemId, timetableItemStickerId } = stickData;
+
+        return new Promise((resolve, reject) => {
+            db.query(
+                TimetableQueries.AddStickerToItem,
+                [timetableItemId, timetableItemStickerId],
+                (error: Error, addingInfo: ISqlSuccessResponse) => {
+                    if (error) {
+                        return reject(newBadRequestException(TimetableQueryList.AddStickerToItem));
+                    }
+
+                    resolve(addingInfo);
+                },
+            );
+        });
+    }
+
+    public deleteStickerFromItem(stickData: IStickData): Promise<ISqlSuccessResponse> {
+        const { timetableItemId, timetableItemStickerId } = stickData;
+
+        return new Promise((resolve, reject) => {
+            db.query(
+                TimetableQueries.DeleteStickerFromItem,
+                [timetableItemId, timetableItemStickerId],
+                (error: Error, deleteingInfo: ISqlSuccessResponse) => {
+                    if (error) {
+                        return reject(newBadRequestException(TimetableQueryList.DeleteStickerFromItem));
+                    }
+
+                    resolve(deleteingInfo);
+                },
+            );
+        });
+    }
+
     public editTimetableItemsGroup(
         userId: number,
         groupId: number,
@@ -218,6 +261,22 @@ export class TimetableService {
         });
     }
 
+    private getTimetableItemStickers(timetableItemId: number): Promise<ITimetableItemSticker[]> {
+        return new Promise((resolve, reject) => {
+            db.query(
+                TimetableQueries.GetAddedStickersToTimetableItem,
+                [timetableItemId],
+                (error: Error, addedStickers: ITimetableItemSticker[]) => {
+                    if (error) {
+                        return reject(newBadRequestException(TimetableQueryList.GetAddedStickersToTimetableItem));
+                    }
+
+                    resolve(addedStickers);
+                },
+            );
+        });
+    }
+
     private createUserStickerConnection(userId: number, stickerId: number): Promise<ISqlSuccessResponse> {
         return new Promise((resolve, reject) => {
             db.query(
@@ -225,7 +284,7 @@ export class TimetableService {
                 [userId, stickerId],
                 (error: Error, successResponse: ISqlSuccessResponse) => {
                     if (error) {
-                        return reject(newBadRequestException(TimetableQueries.CreateUserStickerConnection));
+                        return reject(newBadRequestException(TimetableQueryList.CreateUserStickerConnection));
                     }
 
                     resolve(successResponse);

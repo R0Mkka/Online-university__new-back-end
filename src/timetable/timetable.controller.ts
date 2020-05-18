@@ -19,9 +19,11 @@ import {
     IDeletedTimetableItemsGroupInfo,
     IEditedTimetableItemsGroup,
     IEditedTimetableItemsGroupInfo,
+    IStickData,
 } from '../models/timetable.models';
 import { SwaggerTags } from '../constants';
 import { tryNumberParse } from '../helpers';
+import { ISqlSuccessResponse } from 'src/models/common.models';
 
 // Swagger
 @UseGuards(AuthGuard())
@@ -75,6 +77,27 @@ export class TimetableController {
         @Request() req: IAuthReq,
     ): Promise<ICreatedTimetableItemsStickerInfo> {
         return this.timetableService.createTimetableItemsSticker(req.user.userId, newTimetableItemsStickerData);
+    }
+
+    @Post('add-sticker-to-item')
+    public addStickerToItem(
+        @Body() stickData: IStickData,
+    ): Promise<ISqlSuccessResponse> {
+        return this.timetableService.addStickerToItem(stickData);
+    }
+
+    @Delete('delete/:stickerId/from/:itemId')
+    public deleteStickerFromItem(
+        @Param('itemId') itemIdAsString: string,
+        @Param('stickerId') stickerIdAsString: string,
+    ): Promise<ISqlSuccessResponse> {
+        const itemId: number = tryNumberParse(itemIdAsString);
+        const stickerId: number = tryNumberParse(stickerIdAsString);
+
+        return this.timetableService.deleteStickerFromItem({
+            timetableItemId: itemId,
+            timetableItemStickerId: stickerId,
+        });
     }
 
     @Patch('items-groups/:groupId')
