@@ -19,10 +19,13 @@ import {
     IDeletedTimetableItemsGroupInfo,
     IEditedTimetableItemsGroup,
     IEditedTimetableItemsGroupInfo,
+    IEditedTimetableItemsStickerInfo,
     IStickData,
     IDeletedTimetableItemInfo,
     IEditedTimetableItem,
     IEditedTimetableItemInfo,
+    IDeletedTimetableItemsStickerInfo,
+    IEditedTimetableItemsSticker,
 } from '../models/timetable.models';
 import { SwaggerTags } from '../constants';
 import { tryNumberParse } from '../helpers';
@@ -51,6 +54,16 @@ export class TimetableController {
     @Get('items-groups')
     public getUserTimetableItemsGroups(@Request() req: IAuthReq): Promise<ITimetableItemGroup[]> {
         return this.timetableService.getUserTimetableItemsGroups(req.user.userId);
+    }
+
+    @Get('items-groups/of-user/:userId')
+    public getOtherUserTimetableItemsGroups(
+        @Param('userId') userIdAsString: string,
+    ): Promise<ITimetableItemGroup[]> {
+        const userId = tryNumberParse(userIdAsString);
+
+        return this.timetableService.getUserTimetableItemsGroups(userId)
+            .then((groups: ITimetableItemGroup[]) => groups.filter(({ isPrivate }) => !isPrivate));
     }
 
     @Get('items-stickers')
@@ -111,6 +124,16 @@ export class TimetableController {
         return this.timetableService.editTimetableItemsGroup(req.user.userId, groupId, editedTimetableItemsGroupData);
     }
 
+    @Patch('items-stickers/:stickerId')
+    public editUserTimetableItemsSticker(
+        @Param('stickerId') stickerIdAsString: string,
+        @Body() editedTimetableItemsStickerData: IEditedTimetableItemsSticker,
+    ): Promise<IEditedTimetableItemsStickerInfo> {
+        const stickerId: number = tryNumberParse(stickerIdAsString);
+
+        return this.timetableService.editTimetableItemsSticker(stickerId, editedTimetableItemsStickerData);
+    }
+
     @Delete('items/:itemId')
     public deleteUserTimetableItem(
         @Param('itemId') itemIdAsString: string,
@@ -129,6 +152,15 @@ export class TimetableController {
         const groupId: number = tryNumberParse(groupIdAsString);
 
         return this.timetableService.deleteTimetableItemsGroup(req.user.userId, groupId);
+    }
+
+    @Delete('items-stickers/:stickerId')
+    public deleteUserTimetableItemsSticker(
+        @Param('stickerId') stickerIdAsString: string,
+    ): Promise<IDeletedTimetableItemsStickerInfo> {
+        const stickerId: number = tryNumberParse(stickerIdAsString);
+
+        return this.timetableService.deleteTimetableItemsSticker(stickerId);
     }
 
     @Delete('delete/:stickerId/from/:itemId')

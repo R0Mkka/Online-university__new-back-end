@@ -8,11 +8,13 @@ export enum TimetableQueryList {
     CreateTimetableItemsGroup = 'CreateTimetableItemsGroup',
     UpdateTimetableItem = 'UpdateTimetableItem',
     UpdateTimetableItemsGroup = 'UpdateTimetableItemsGroup',
+    UpdateTimetableItemsSticker = 'UpdateTimetableItemsSticker',
     CreateTimetableItemsSticker = 'CreateTimetableItemsSticker',
     AddStickerToItem = 'AddStickerToItem',
     DeleteStickerFromItem = 'DeleteStickerFromItem',
     DeleteTimetableItem = 'DeleteTimetableItem',
     DeleteTimetableItemsGroup = 'DeleteTimetableItemsGroup',
+    DeleteTimetableItemsSticker = 'DeleteTimetableItemsSticker',
     GetAddedStickersToTimetableItem = 'GetAddedStickersToTimetableItem',
     CreateUserStickerConnection = 'CreateUserStickerConnection',
 }
@@ -101,6 +103,17 @@ export const TimetableQueries: { [key in TimetableQueryList]: string } = {
             userId = ? AND timetableItemGroupId = ?;
     `,
 
+    UpdateTimetableItemsSticker: `
+        UPDATE
+            ${DBTables.TimetableItemStickers}
+        SET
+            title = ?,
+            abbreviation = ?,
+            color = ?
+        WHERE
+            timetableItemStickerId = ?;
+    `,
+
     CreateTimetableItemsSticker: `
         INSERT INTO ${DBTables.TimetableItemStickers} (
             title,
@@ -140,6 +153,14 @@ export const TimetableQueries: { [key in TimetableQueryList]: string } = {
             ${DBTables.TimetableItemGroups}
         WHERE
             userId = ? AND timetableItemGroupId = ?;
+    `,
+
+    DeleteTimetableItemsSticker: `
+        DELETE
+        FROM
+            ${DBTables.TimetableItemStickers}
+        WHERE
+            timetableItemStickerId = ?;
     `,
 
     GetAddedStickersToTimetableItem: `

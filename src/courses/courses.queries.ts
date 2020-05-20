@@ -3,7 +3,11 @@ import { DBTables } from '../constants';
 export enum CoursesQueryList {
     GetUserCourses = 'GetUserCourses',
     GetAllCourses = 'GetAllCourses',
+    GetCourseBlockedUsersData = 'GetCourseBlockedUsersData',
+    GetCourseBlockedUsers = 'GetCourseBlockedUsers',
     CreateCourse = 'CreateCourse',
+    BlockCourseForUser = 'BlockCourseForUser',
+    UnblockCourseForUser = 'UnblockCourseForUser',
     RemoveCourse = 'RemoveCourse',
     GenerateCourseData = 'GenerateCourseData',
     CreateUserCourseConnection = 'CreateUserCourseConnection',
@@ -73,6 +77,27 @@ export const Queries: { [key in CoursesQueryList]: string } = {
         GROUP BY ${DBTables.Courses}.courseId;
     `,
 
+    GetCourseBlockedUsersData: `
+        SELECT
+            *
+        FROM
+            ${DBTables.CoursesBlockedUsers}
+        WHERE
+            courseId = ?;
+    `,
+
+    GetCourseBlockedUsers: `
+        SELECT
+            *
+        FROM
+            ${DBTables.Users}
+        LEFT JOIN
+            ${DBTables.CoursesBlockedUsers}
+        USING(userId)
+        WHERE
+            courseId = ?;
+    `,
+
     CreateCourse: `
         INSERT INTO ${DBTables.Courses} (
             courseDataId,
@@ -83,6 +108,22 @@ export const Queries: { [key in CoursesQueryList]: string } = {
             courseDescription,
             courseCode
         ) VALUES (?,?,?,?,?,?,?);
+    `,
+
+    BlockCourseForUser: `
+        INSERT INTO ${DBTables.CoursesBlockedUsers} (
+            courseId,
+            userId
+        )
+        VALUES (?,?);
+    `,
+
+    UnblockCourseForUser: `
+        DELETE
+        FROM
+            ${DBTables.CoursesBlockedUsers}
+        WHERE
+            courseId = ? AND userId = ?;
     `,
 
     RemoveCourse: `

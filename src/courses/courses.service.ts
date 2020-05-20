@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException, ForbiddenException } from '@nestjs/common';
+import { Injectable, NotFoundException, ForbiddenException, HttpException, HttpStatus } from '@nestjs/common';
 
 import { ChatsService } from '../chats/chats.service';
 import { CourseItemsService } from '../course-items/course-items.service';
@@ -20,7 +20,7 @@ import { ISqlSuccessResponse } from '../models/common.models';
 import { IUserLikePayload } from '../models/auth.models';
 import { Roles, IFullCourseUserData, ICourseUser } from '../models/users.models';
 import { NumberOrString } from '../models/database.models';
-import { newBadRequestException, getCourseUserFromUserData } from '../helpers';
+import { newBadRequestException, getCourseUserFromUserData, getUserFromUserData } from '../helpers';
 
 const db = Database.getInstance();
 
@@ -99,6 +99,22 @@ export class CoursesService {
         };
     }
 
+    public getCourseBlockedUsers(courseId: number): Promise<any[]> {
+        return new Promise((resolve, reject) => {
+            db.query(
+                Queries.GetCourseBlockedUsers,
+                [courseId],
+                (error: Error, userDataList: any[]) => {
+                    if (error) {
+                        return reject(newBadRequestException(CoursesQueryList.GetCourseBlockedUsers));
+                    }
+
+                    resolve(userDataList.map(userData => getUserFromUserData(userData)));
+                },
+            );
+        });
+    }
+
     public async createCourse(courseDto: ICourseCreationData, userPayload: IUserLikePayload): Promise<ICreatedCourseData> {
         const chatName: string = `Чат курса '${courseDto.courseName}'`;
 
@@ -149,6 +165,40 @@ export class CoursesService {
         });
     }
 
+    public blockCourseForUser(courseId: number, userId: number): Promise<any> {
+        return new Promise((resolve, reject) => {
+            db.query(
+                Queries.BlockCourseForUser,
+                [courseId, userId],
+                async (error: Error, blockingResults: ISqlSuccessResponse) => {
+                    if (error) {
+                        return reject(newBadRequestException(CoursesQueryList.BlockCourseForUser));
+                    }
+
+                    await this.destroyConnection(courseId, userId);
+
+                    resolve(blockingResults);
+                },
+            );
+        });
+    }
+
+    public unblockCourseForUser(courseId: number, userId: number): Promise<any> {
+        return new Promise((resolve, reject) => {
+            db.query(
+                Queries.UnblockCourseForUser,
+                [courseId, userId],
+                (error: Error, unblockingResults: ISqlSuccessResponse) => {
+                    if (error) {
+                        return reject(newBadRequestException(CoursesQueryList.UnblockCourseForUser));
+                    }
+
+                    resolve(unblockingResults);
+                },
+            );
+        });
+    }
+
     public async removeCourse(courseId: number, userPayload: IUserLikePayload): Promise<ISqlSuccessResponse> {
         const course: ICourseData = await this.getCourseById(courseId);
 
@@ -178,6 +228,13 @@ export class CoursesService {
     public async joinCourse(courseCode: string, userPayload: IUserLikePayload): Promise<IJoinedCourseData> {
         const course: ICourseData = await this.getCourseByCode(courseCode);
 
+        const blockedUsers: Array<{ courseId: number, userId: number }> = await this.getCourseBlockedUsersData(course.courseId);
+        const userBlocked = blockedUsers.some(({ userId }) => userId === userPayload.userId);
+
+        if (userBlocked) {
+            return Promise.reject(new HttpException('User is blocked!', HttpStatus.FORBIDDEN));
+        }
+
         await this.chatsService.createUserChatConnection(course.chatId, userPayload);
 
         await this.createUserCourseConnection(course.courseId, userPayload);
@@ -205,6 +262,22 @@ export class CoursesService {
                         courseId,
                         deletedUserId: userId,
                     });
+                },
+            );
+        });
+    }
+
+    private getCourseBlockedUsersData(courseId: number): Promise<any[]> {
+        return new Promise((resolve, reject) => {
+            db.query(
+                Queries.GetCourseBlockedUsersData,
+                [courseId],
+                (error: Error, blockedUsers: any[]) => {
+                    if (error) {
+                        return reject(newBadRequestException(CoursesQueryList.GetCourseBlockedUsersData));
+                    }
+
+                    resolve(blockedUsers);
                 },
             );
         });

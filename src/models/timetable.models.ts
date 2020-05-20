@@ -68,6 +68,12 @@ export interface IEditedTimetableItemsGroup {
     isPrivate: 1 | 0;
 }
 
+export interface IEditedTimetableItemsSticker {
+    title: string;
+    abbreviation: string;
+    color: string;
+}
+
 export interface IEditedTimetableItem {
     dayOfTheWeekId: DaysOfTheWeek;
     courseId: number | null;
@@ -93,12 +99,20 @@ export interface IEditedTimetableItemsGroupInfo {
     editedTimetableItemsGroupId: number;
 }
 
+export interface IEditedTimetableItemsStickerInfo {
+    editedTimetableItemsStickerId: number;
+}
+
 export interface IDeletedTimetableItemInfo {
     deletedTimetableItemId: number;
 }
 
 export interface IDeletedTimetableItemsGroupInfo {
     deletedTimetableItemsGroupId: number;
+}
+
+export interface IDeletedTimetableItemsStickerInfo {
+    deletedTimetableItemsStickerId: number;
 }
 
 export interface INewTimetableItemsSticker {

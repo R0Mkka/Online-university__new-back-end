@@ -68,6 +68,13 @@ export class CoursesController {
         return this.coursesService.getFullCourseData(courseId);
     }
 
+    @Get(':courseId/blocked-users')
+    public getCourseBlockedUsers(@Param('courseId') courseIdAsString: string): Promise<any> { // TODO
+        const courseId: number = tryNumberParse(courseIdAsString);
+
+        return this.coursesService.getCourseBlockedUsers(courseId);
+    }
+
     @UseGuards(NoStudentsGuard)
     @Post()
     @ApiImplicitBody(createCourseOptions)
@@ -79,6 +86,22 @@ export class CoursesController {
         @Request() req: IAuthReq,
     ): Promise<ICreatedCourseData> {
         return this.coursesService.createCourse(courseCreationInfo, req.user);
+    }
+
+    @UseGuards(NoStudentsGuard)
+    @Post('block-user')
+    public blockUser(
+        @Body() blockCourseForUser: { courseId: number, userId: number },
+    ): Promise<any> { // TODO
+        return this.coursesService.blockCourseForUser(blockCourseForUser.courseId, blockCourseForUser.userId);
+    }
+
+    @UseGuards(NoStudentsGuard)
+    @Post('unblock-user')
+    public unblockUser(
+        @Body() unblockCourseForUser: { courseId: number, userId: number },
+    ): Promise<any> { // TODO
+        return this.coursesService.unblockCourseForUser(unblockCourseForUser.courseId, unblockCourseForUser.userId);
     }
 
     @UseGuards(NoStudentsGuard)

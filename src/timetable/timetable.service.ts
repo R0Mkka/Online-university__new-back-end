@@ -21,6 +21,9 @@ import {
     IDeletedTimetableItemInfo,
     IEditedTimetableItem,
     IEditedTimetableItemInfo,
+    IDeletedTimetableItemsStickerInfo,
+    IEditedTimetableItemsSticker,
+    IEditedTimetableItemsStickerInfo,
 } from '../models/timetable.models';
 import { ISqlSuccessResponse } from '../models/common.models';
 import { newBadRequestException } from '../helpers';
@@ -263,6 +266,32 @@ export class TimetableService {
         });
     }
 
+    public editTimetableItemsSticker(
+        stickerId: number,
+        editedTimetableItemsStickerData: IEditedTimetableItemsSticker,
+    ): Promise<IEditedTimetableItemsStickerInfo> {
+        return new Promise((resolve, reject) => {
+            db.query(
+                TimetableQueries.UpdateTimetableItemsSticker,
+                [
+                    editedTimetableItemsStickerData.title,
+                    editedTimetableItemsStickerData.abbreviation,
+                    editedTimetableItemsStickerData.color,
+                    stickerId,
+                ],
+                (error: Error, _: ISqlSuccessResponse) => {
+                    if (error) {
+                        return reject(newBadRequestException(TimetableQueryList.UpdateTimetableItemsSticker));
+                    }
+
+                    resolve({
+                        editedTimetableItemsStickerId: stickerId,
+                    });
+                },
+            );
+        });
+    }
+
     public deleteTimetableItem(userId: number, itemId: number): Promise<IDeletedTimetableItemInfo> {
         return new Promise((resolve, reject) => {
             db.query(
@@ -293,6 +322,24 @@ export class TimetableService {
 
                     resolve({
                         deletedTimetableItemsGroupId: groupId,
+                    });
+                },
+            );
+        });
+    }
+
+    public deleteTimetableItemsSticker(stickerId: number): Promise<IDeletedTimetableItemsStickerInfo> {
+        return new Promise((resolve, reject) => {
+            db.query(
+                TimetableQueries.DeleteTimetableItemsSticker,
+                [stickerId],
+                (error: Error, _: ISqlSuccessResponse) => {
+                    if (error) {
+                        return reject(newBadRequestException(TimetableQueryList.DeleteTimetableItemsSticker));
+                    }
+
+                    resolve({
+                        deletedTimetableItemsStickerId: stickerId,
                     });
                 },
             );
