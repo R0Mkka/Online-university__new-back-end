@@ -46,6 +46,24 @@ export class TimetableService {
         });
     }
 
+    public getOtherUserTimetable(userId: number): Promise<ITimetable> {
+        return new Promise(async (resolve) => {
+            const timetableItemsGroups: ITimetableItemGroup[] = await this.getUserTimetableItemsGroups(userId)
+                .then((groups: ITimetableItemGroup[]) => groups.filter(({ isPrivate }) => !isPrivate));
+
+            const timetableItems: ITimetableItem[] = await this.getUserTimetableItems(userId)
+                .then((items: ITimetableItem[]) => items.filter(({ timetableItemGroupId }) => {
+                    return timetableItemsGroups.some((group: ITimetableItemGroup) => group.timetableItemGroupId === timetableItemGroupId);
+                }));
+
+            resolve({
+                items: timetableItems,
+                groups: timetableItemsGroups,
+                stickers: [],
+            });
+        });
+    }
+
     public getUserTimetableItems(userId: number): Promise<ITimetableItem[]> {
         return new Promise((resolve, reject) => {
             db.query(

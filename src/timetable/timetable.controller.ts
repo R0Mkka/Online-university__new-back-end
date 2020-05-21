@@ -46,6 +46,13 @@ export class TimetableController {
         return this.timetableService.getUserTimetable(req.user.userId);
     }
 
+    @Get('of-user/:userId')
+    public getOtherUserTimetable(@Param('userId') userIdAsString: string): Promise<ITimetable> {
+        const userId: number = tryNumberParse(userIdAsString);
+
+        return this.timetableService.getOtherUserTimetable(userId);
+    }
+
     @Get('items')
     public getUserTimetableItems(@Request() req: IAuthReq): Promise<ITimetableItem[]> {
         return this.timetableService.getUserTimetableItems(req.user.userId);
