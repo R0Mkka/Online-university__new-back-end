@@ -8,6 +8,7 @@ export enum CoursesQueryList {
     CreateCourse = 'CreateCourse',
     BlockCourseForUser = 'BlockCourseForUser',
     UnblockCourseForUser = 'UnblockCourseForUser',
+    ModifyCourse = 'ModifyCourse',
     RemoveCourse = 'RemoveCourse',
     GenerateCourseData = 'GenerateCourseData',
     CreateUserCourseConnection = 'CreateUserCourseConnection',
@@ -124,6 +125,18 @@ export const Queries: { [key in CoursesQueryList]: string } = {
             ${DBTables.CoursesBlockedUsers}
         WHERE
             courseId = ? AND userId = ?;
+    `,
+
+    ModifyCourse: `
+        UPDATE
+            ${DBTables.Courses}
+        SET
+            courseName = ?,
+            courseGroupName = ?,
+            courseDescription = ?,
+            courseCode = ?
+        WHERE
+            courseId = ? AND courseOwnerId = ?;
     `,
 
     RemoveCourse: `

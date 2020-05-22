@@ -1,4 +1,4 @@
-import { Controller, UseGuards, Get, Request, Post, Delete, Param, Body, Query } from '@nestjs/common';
+import { Controller, UseGuards, Get, Request, Post, Delete, Param, Body, Query, Patch } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import {
     ApiBearerAuth,
@@ -102,6 +102,18 @@ export class CoursesController {
         @Body() unblockCourseForUser: { courseId: number, userId: number },
     ): Promise<any> { // TODO
         return this.coursesService.unblockCourseForUser(unblockCourseForUser.courseId, unblockCourseForUser.userId);
+    }
+
+    @UseGuards(NoStudentsGuard)
+    @Patch(':courseId')
+    public modifyCourse(
+        @Param('courseId') courseIdAsString: string,
+        @Body() courseCreationInfo: ICourseCreationData,
+        @Request() req: IAuthReq,
+    ): Promise<{ editedCourseId: number }> {
+        const courseId: number = tryNumberParse(courseIdAsString);
+
+        return this.coursesService.modifyCourse(req.user.userId, courseId, courseCreationInfo);
     }
 
     @UseGuards(NoStudentsGuard)

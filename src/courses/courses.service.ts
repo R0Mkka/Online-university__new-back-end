@@ -21,6 +21,8 @@ import { IUserLikePayload } from '../models/auth.models';
 import { Roles, IFullCourseUserData, ICourseUser } from '../models/users.models';
 import { NumberOrString } from '../models/database.models';
 import { newBadRequestException, getCourseUserFromUserData, getUserFromUserData } from '../helpers';
+import { TimetableService } from '../timetable/timetable.service';
+import { ITimetableItem } from 'src/models/timetable.models';
 
 const db = Database.getInstance();
 
@@ -29,6 +31,7 @@ export class CoursesService {
     constructor(
         private chatsService: ChatsService,
         private courseItemsService: CourseItemsService,
+        private timetableService: TimetableService,
     ) {}
 
     public getUserCourseList(userId: number): Promise<ICourseData[]> {
@@ -199,8 +202,53 @@ export class CoursesService {
         });
     }
 
-    public async removeCourse(courseId: number, userPayload: IUserLikePayload): Promise<ISqlSuccessResponse> {
+    public async modifyCourse(userId: number, courseId: number, courseEditData: ICourseCreationData): Promise<{ editedCourseId: number }> {
         const course: ICourseData = await this.getCourseById(courseId);
+
+        if (course.courseOwnerId !== userId) {
+            throw new HttpException(`You don't have enough rights to edit the course!`, HttpStatus.FORBIDDEN);
+        }
+
+        const linkedTimetableItems = await this.timetableService.getUserTimetableItems(userId)
+            .then((timetableItems: ITimetableItem[]) => timetableItems.filter(item => item.courseId === course.courseId));
+
+        for (const item of linkedTimetableItems) {
+            await this.timetableService.editTimetableItem(
+                userId,
+                item.timetableItemId,
+                {
+                    ...item,
+                    subject: courseEditData.courseName,
+                },
+            );
+        }
+
+        return new Promise((resolve, reject) => {
+            db.query(
+                Queries.ModifyCourse,
+                [
+                    courseEditData.courseName,
+                    courseEditData.courseGroupName,
+                    courseEditData.courseDescription,
+                    courseEditData.courseCode,
+                    courseId,
+                    userId,
+                ],
+                (error: Error, _: ISqlSuccessResponse) => {
+                    if (error) {
+                        return reject(newBadRequestException(CoursesQueryList.ModifyCourse));
+                    }
+
+                    resolve({
+                        editedCourseId: courseId,
+                    });
+                },
+            );
+        });
+    }
+
+    public async removeCourse(courseId: number, userPayload: IUserLikePayload): Promise<ISqlSuccessResponse> {
+        const course: IFullCourseData = await this.getFullCourseData(courseId);
 
         if (!course) {
             throw new NotFoundException(`[${CoursesQueryList.RemoveCourse}] Course does not exist`);
@@ -210,13 +258,33 @@ export class CoursesService {
             throw new ForbiddenException(`[${CoursesQueryList.RemoveCourse}] Course can be removed only by its owner`);
         }
 
+        for (const courseItem of course.courseItems) {
+            if (courseItem.attachments.length > 0) {
+                await this.courseItemsService.removeAttachmentsFiles(courseItem.attachments);
+            }
+        }
+
+        const unlinkedTimetableItems = await this.timetableService.getUserTimetableItems(userPayload.userId)
+            .then((timetableItems: ITimetableItem[]) => timetableItems.filter(item => item.courseId === course.courseId));
+
+        for (const item of unlinkedTimetableItems) {
+            await this.timetableService.editTimetableItem(
+                userPayload.userId,
+                item.timetableItemId,
+                {
+                    ...item,
+                    courseId: null,
+                },
+            );
+        }
+
         return new Promise((resolve, reject) => {
             db.query(
                 Queries.RemoveCourse,
                 [courseId],
                 (error: Error, removingInfo: ISqlSuccessResponse) => {
                     if (error) {
-                        reject(newBadRequestException(CoursesQueryList.RemoveCourse));
+                        return reject(newBadRequestException(CoursesQueryList.RemoveCourse));
                     }
 
                     resolve(removingInfo);

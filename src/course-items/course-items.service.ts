@@ -183,7 +183,7 @@ export class CourseItemsService {
                 if (err) {
                   return rej(err);
                 }
-  
+
                 res();
               });
             });
@@ -392,7 +392,7 @@ export class CourseItemsService {
     return params;
   }
 
-  private removeAttachmentsFiles(attachments: ICourseItemAttachment[]): Promise<void> {
+  public removeAttachmentsFiles(attachments: ICourseItemAttachment[]): Promise<void> {
     return new Promise((resolve, reject) => {
       let filesLeft = attachments.length;
 
