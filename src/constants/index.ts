@@ -23,6 +23,12 @@ export enum DBTables {
     TimetableItemsTimetableItemsStickers = 'timetable_items_timetable_items_stickers',
     UsersTimetableItemsStickers = 'users_timetable_items_stickers',
     CoursesBlockedUsers = 'courses_blocked_users',
+    course_tasks_statuses = 'course_tasks_statuses',
+    course_tasks = 'course_tasks',
+    course_task_attachments = 'course_task_attachments',
+    solution_statuses = 'solution_statuses',
+    solutions = 'solutions',
+    solution_attachments = 'solution_attachments',
 }
 
 export enum SwaggerTags {

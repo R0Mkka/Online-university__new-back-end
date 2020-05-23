@@ -10,6 +10,7 @@ import { ChatsModule } from './chats/chats.module';
 import { FilesModule } from './upload/files.module';
 import { WebsocketsModule } from './websockets/websockets.module';
 import { TimetableModule } from './timetable/timetable.module';
+import { CourseTasksModule } from './course-tasks/course-tasks.module';
 
 import { AppController } from './app.controller';
 
@@ -24,6 +25,7 @@ import { AppController } from './app.controller';
     FilesModule,
     WebsocketsModule,
     TimetableModule,
+    CourseTasksModule,
   ],
   controllers: [AppController],
   providers: [
