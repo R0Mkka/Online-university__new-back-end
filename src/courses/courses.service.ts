@@ -22,7 +22,9 @@ import { Roles, IFullCourseUserData, ICourseUser } from '../models/users.models'
 import { NumberOrString } from '../models/database.models';
 import { newBadRequestException, getCourseUserFromUserData, getUserFromUserData } from '../helpers';
 import { TimetableService } from '../timetable/timetable.service';
-import { ITimetableItem } from 'src/models/timetable.models';
+import { ITimetableItem } from '../models/timetable.models';
+import { CourseTasksService } from '../course-tasks/course-tasks.service';
+import { ICourseTask, IFullCourseTask } from '../models/course-tasks';
 
 const db = Database.getInstance();
 
@@ -32,6 +34,7 @@ export class CoursesService {
         private chatsService: ChatsService,
         private courseItemsService: CourseItemsService,
         private timetableService: TimetableService,
+        private courseTasksService: CourseTasksService,
     ) {}
 
     public getUserCourseList(userId: number): Promise<ICourseData[]> {
@@ -93,11 +96,13 @@ export class CoursesService {
     public async getFullCourseData(courseId: number): Promise<IFullCourseData> {
         const courseWithoutContent: ICourseData = await this.getCourseById(courseId);
         const courseItems: ICourseItem[] = await this.getCourseItems(courseId);
+        const courseTasks: IFullCourseTask[] = await this.courseTasksService.getFullCourseTasks(courseId);
         const courseUsers: ICourseUser[] = await this.getCourseUsers(courseId);
 
         return {
             ...courseWithoutContent,
             courseItems,
+            courseTasks,
             courseUsers,
         };
     }

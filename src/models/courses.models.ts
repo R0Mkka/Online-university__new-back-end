@@ -1,4 +1,5 @@
 import { IUser, ICourseUser } from './users.models';
+import { ICourseTask } from './course-tasks';
 
 export interface ICourseCreationData {
     courseName: string;
@@ -79,6 +80,7 @@ export interface ICourseItemAttachment {
 
 export interface IFullCourseData extends ICourseData {
     courseItems: ICourseItem[];
+    courseTasks: ICourseTask[];
     courseUsers: ICourseUser[];
 }
 

@@ -5,7 +5,7 @@ import { ICourseUser } from '../../models/users.models';
 import { CourseItemDto } from './course-item';
 import { CourseUserDto } from './course-user';
 
-export class FullCourseDataDto implements IFullCourseData {
+export class FullCourseDataDto {
   @ApiModelProperty({ type: Number, required: true })
   public courseId: number;
 
